@@ -18,7 +18,7 @@ async function hit_gennonce() {
         if (globalThis.paused) {
             break;
         }
-        var payid = fetch("/api/gennonce")
+        fetch("/api/gennonce")
             .then((response) => response.json())
             .then(function (data) {
                 document.getElementById("nonce").innerHTML = data.nonce;
@@ -56,7 +56,7 @@ function reset_blind() {
 }
 
 function hit_genblind() {
-    var payid = fetch(
+    fetch(
         "/api/blind?" +
             new URLSearchParams({
                 nonce: document.getElementById("nonce").innerHTML,
@@ -99,7 +99,7 @@ function hit_apply_bindings() {
 }
 
 function hit_sign() {
-    var payid = fetch(
+    fetch(
         "/api/sign?" +
             new URLSearchParams({
                 nonce: document.getElementById("usednonce_signform")
@@ -122,7 +122,7 @@ function hit_sign() {
 }
 
 function hit_unblind() {
-    var payid = fetch(
+    fetch(
         "/api/unblind?" +
             new URLSearchParams({
                 blindsig:
@@ -144,7 +144,7 @@ function hit_unblind() {
 }
 
 function hit_verify() {
-    var payid = fetch(
+    fetch(
         "/api/verify?" +
             new URLSearchParams({
                 tweaked_pubkey:
