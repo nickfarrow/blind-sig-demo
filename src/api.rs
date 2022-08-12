@@ -240,18 +240,25 @@ pub async fn verify(
         .expect("valid pubkey")
         .into_point_with_even_y();
 
-    let signature = Signature {
-        s: Scalar::from_str(&signature).expect("valid scalar"),
-        R: Point::<Normal, Public, NonZero>::from_str(&blinded_nonce)
-            .expect("valid nonce")
-            .to_xonly(),
-    };
+    let sig_read = Scalar::from_str(&signature);
 
     Json(ValidResponse {
-        valid: schnorr.verify(
-            &verification_pubkey,
-            Message::<Public>::plain("blind-schnorr", message.as_bytes()),
-            &signature,
-        ),
+        valid: {
+            if sig_read.is_err() {
+                false
+            } else {
+                let signature = Signature {
+                    s: sig_read.unwrap(),
+                    R: Point::<Normal, Public, NonZero>::from_str(&blinded_nonce)
+                        .expect("valid nonce")
+                        .to_xonly(),
+                };
+                schnorr.verify(
+                    &verification_pubkey,
+                    Message::<Public>::plain("blind-schnorr", message.as_bytes()),
+                    &signature,
+                )
+            }
+        },
     })
 }
