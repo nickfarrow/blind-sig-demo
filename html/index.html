@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="/style.css" />
     </head>
 
     <script></script>
@@ -46,10 +46,7 @@
                 <li><b>t</b>: <input id="t" size="64" readonly /></li>
             </ul>
 
-            <form
-                id="apply_blindings"
-                onsubmit="return show_applied_blindings()"
-            >
+            <form id="apply_blindings" onsubmit="return hit_apply_bindings()">
                 <input
                     class="button button1"
                     type="submit"
@@ -58,15 +55,24 @@
             </form>
             <div id="blinded_values">
                 <p><b>Blinded nonce</b>: <span id="blinded_nonce"></span></p>
-                <p><b>Blinded public key</b>: <span id="blinded_publickey"></span></p>
+                <p>
+                    <b>Blinded public key</b>:
+                    <span id="blinded_publickey"></span>
+                </p>
                 <p><b>Challenge</b>: <span id="challenge"></span></p>
             </div>
 
             <form id="sign" onsubmit="return hit_sign()">
                 <div>
                     <ul class="container">
-                        <li><b>Nonce</b>: <input id="usednonce_signform" size="64" readonly /></li>
-                        <li><b>Challenge</b>: <input id="challenge_signform" size="64" readonly /></li>
+                        <li>
+                            <b>Nonce</b>:
+                            <input id="usednonce_signform" size="64" readonly />
+                        </li>
+                        <li>
+                            <b>Challenge</b>:
+                            <input id="challenge_signform" size="64" readonly />
+                        </li>
                     </ul>
 
                     <input
@@ -76,7 +82,9 @@
                     />
                 </div>
             </form>
-            <p><b>Blinded Signature</b>: <span id="blinded_signature"></span></p>
+            <p>
+                <b>Blinded Signature</b>: <span id="blinded_signature"></span>
+            </p>
 
             <form id="unblind" onsubmit="return hit_unblind()">
                 <div>
@@ -89,14 +97,29 @@
             </form>
             <p><b>Signature</b>: <span id="unblinded_signature"></span></p>
 
-
-            <form id="sign" onsubmit="return hit_verify()">
+            <form id="verify" onsubmit="return hit_verify()">
                 <div>
                     <ul class="container">
-                        <li><b>Blinded Publickey</b>: <input id="blinded_pubkey_verifynform" size="64" readonly /></li>
-                        <li><b>Message</b>: <input id="message_verifynform" size="64" readonly /></li>
-                        <li><b>Signature</b>: <input id="signature_verifynform" size="64" readonly /></li>
-                        <li><b>Blinded nonce</b>: <input id="blinded_nonce_verifynform" size="64"/></li>
+                        <li>
+                            <b>Blinded Publickey</b>:
+                            <input id="blinded_pubkey_verifyform" size="64" />
+                        </li>
+                        <li>
+                            <b>Message</b>:
+                            <input id="message_verifyform" size="64" readonly />
+                        </li>
+                        <li>
+                            <b>Signature</b>:
+                            <input id="signature_verifyform" size="64" />
+                        </li>
+                        <li>
+                            <b>Blinded nonce</b>:
+                            <input
+                                id="blinded_nonce_verifyform"
+                                size="64"
+                                readonly
+                            />
+                        </li>
                     </ul>
 
                     <input
@@ -106,16 +129,23 @@
                     />
                 </div>
             </form>
-            <p><b>Valid?</b>: <span id="blinded_signature"></span></p>
-
-
+            <p><b>Valid?</b>: <span id="verify_success"></span></p>
         </div>
     </body>
 
     <script>
         globalThis.paused = true;
         const timer = (ms) => new Promise((res) => setTimeout(res, ms));
-        show_applied_blindings();
+
+        function hide_applied_blindings() {
+            document.getElementById("blinded_nonce").style.display = "none";
+            document.getElementById("blinded_publickey").style.display = "none";
+            document.getElementById("challenge").style.display = "none";
+            document.getElementById("challenge_signform").style.value = "";
+
+            return false;
+        }
+        hide_applied_blindings();
 
         async function hit_gennonce() {
             while (true) {
@@ -171,14 +201,21 @@
             )
                 .then((response) => response.json())
                 .then(function (data) {
+                    document.getElementById("message_verifyform").value =
+                        document.getElementById("message").value;
+                    document.getElementById("blinded_pubkey_verifyform").value =
+                        data.tweaked_pubkey;
+                    document.getElementById("message").value;
+
                     document.getElementById("blinded_nonce").innerHTML =
                         data.blinded_nonce;
+                    document.getElementById("blinded_nonce_verifyform").value = data.blinded_nonce;
                     document.getElementById("blinded_publickey").innerHTML =
                         data.tweaked_pubkey;
+                    globalThis.challenge = data.challenge;
                     document.getElementById("challenge").innerHTML =
-                        data.challenge;
-                    document.getElementById("challenge_signform").value =
-                        data.challenge;
+                        globalThis.challenge;
+                    document.getElementById("challenge_signform").value = "";
                     document.getElementById("alpha").value = data.alpha;
                     document.getElementById("beta").value = data.beta;
                     document.getElementById("t").value = data.t;
@@ -186,18 +223,13 @@
             return false;
         }
 
-        function show_applied_blindings() {
+        function hit_apply_bindings() {
             document.getElementById("blinded_nonce").style.display = "inline";
             document.getElementById("blinded_publickey").style.display =
                 "inline";
             document.getElementById("challenge").style.display = "inline";
-            return false;
-        }
-
-        function hide_applied_blindings() {
-            document.getElementById("blinded_nonce").style.display = "none";
-            document.getElementById("blinded_publickey").style.display = "none";
-            document.getElementById("challenge").style.display = "none";
+            document.getElementById("challenge_signform").value =
+                globalThis.challenge;
             return false;
         }
 
@@ -231,7 +263,8 @@
                         blindsig:
                             document.getElementById("blinded_signature")
                                 .innerHTML,
-                        challenge: document.getElementById("challenge_signform").value,
+                        challenge:
+                            document.getElementById("challenge_signform").value,
                         alpha: document.getElementById("alpha").value,
                         tweak: document.getElementById("t").value,
                     })
@@ -252,17 +285,22 @@
                         tweaked_pubkey:
                             document.getElementById("blinded_publickey")
                                 .innerHTML,
-                        message:
-                            document.getElementById("message").value,
-                        blinded_nonce: document.getElementById("blinded_nonce").value,
-                        signature: document.getElementById("unblinded_signature").value,
+                        message: document.getElementById("message").value,
+                        blinded_nonce:
+                            document.getElementById("blinded_nonce_verifyform").value,
+                        signature: document.getElementById(
+                            "signature_verifyform"
+                        ).value,
                     })
             )
                 .then((response) => response.json())
                 .then(function (data) {
-                    // console.log(data);
-                    document.getElementById("unblinded_signature").innerHTML =
-                        data.signature;
+                    console.log(data);
+                    if (data.valid) {
+                        document.getElementById("verify_success").innerHTML = "Valid signature :)";
+                    } else {
+                        document.getElementById("verify_success").innerHTML = "INVALID SIGNATURE";
+                    }
                 });
             return false;
         }

@@ -1,5 +1,8 @@
+use std::fs;
+use std::path::Path;
 use std::str::FromStr;
 
+use rand::thread_rng;
 use rocket::get;
 use rocket::http::Status;
 use rocket::serde::{json::Json, Serialize};
@@ -25,8 +28,15 @@ use rocket_db_pools::Database;
 pub struct Main(sqlx::SqlitePool);
 
 fn get_sec_pub() -> (Scalar<Secret, NonZero>, Point<EvenY>) {
+    let secret_file = "secret";
+    if !Path::new(secret_file).exists() {
+        println!("No existing secret found, creating secret.");
+        let mut rng = thread_rng();
+        let secret = Scalar::<Secret, NonZero>::random(&mut rng);
+        fs::write(secret_file, secret.to_string()).expect("Unable to write file");
+    }
     let mut secret = Scalar::<Secret, NonZero>::from_str(
-        "3fe2022c376b76d9b88e8dfb2ba0801d4dafb7152b10efda038e9cf73e613a93",
+        &fs::read_to_string(secret_file).expect("secret exists"),
     )
     .expect("valid");
     let (public_key, secret_needs_negation) = g!(secret * G).normalize().into_point_with_even_y();
@@ -123,7 +133,7 @@ pub async fn blind(message: String, nonce: String) -> Json<BlindSession> {
     let blind_session = Blinder::blind(
         typed_nonce,
         get_sec_pub().1,
-        Message::plain("bind-schnorr", message.as_bytes()),
+        Message::<Public>::plain("blind-schnorr", message.as_bytes()),
         schnorr,
         &mut rand::thread_rng(),
     );
@@ -153,7 +163,6 @@ pub async fn sign(
     let signature_request = SignatureRequest {
         blind_challenge: Scalar::from_str(&challenge).expect("valid scalar"),
     };
-
     // Lookup nonce secret:
     let mut txn = pool.begin().await.unwrap();
     let secret = get_nonce_secret(&mut *txn, nonce.clone()).await;
@@ -233,7 +242,7 @@ pub async fn verify(
 
     let signature = Signature {
         s: Scalar::from_str(&signature).expect("valid scalar"),
-        R: Point::<Normal, Public, _>::from_str(&blinded_nonce)
+        R: Point::<Normal, Public, NonZero>::from_str(&blinded_nonce)
             .expect("valid nonce")
             .to_xonly(),
     };
