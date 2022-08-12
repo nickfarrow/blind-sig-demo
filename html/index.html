@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+
+    <script></script>
+
+    <body>
+        <div>
+            <form id="gennonce" onsubmit="return toggle_pause_nonce()">
+                <div>
+                    <p><b>Nonce</b>: <span id="nonce"></span></p>
+                    <input
+                        class="button button1"
+                        type="submit"
+                        id="usenonce_button"
+                        value="Generate Nonces"
+                    />
+                </div>
+            </form>
+            <br />
+            <form id="blind" onsubmit="return hit_genblind()">
+                <div>
+                    <!-- <label>Nonce:</label>
+                    <input id="usednonce_blindform" name="nonce" value="" /> -->
+                    <label><b>Message</b>:</label>
+                    <input
+                        style="display: inline"
+                        name="message"
+                        id="message"
+                        placeholder="enter your message here"
+                        required
+                    />
+                    <input
+                        class="button button1"
+                        type="submit"
+                        value="Generate blinding values"
+                    />
+                </div>
+            </form>
+            <!-- <p>Choosing three random values:</p> -->
+            <ul class="container">
+                <li><b>alpha</b>: <input id="alpha" size="64" readonly /></li>
+                <li><b>beta</b>: <input id="beta" size="64" readonly /></li>
+                <li><b>t</b>: <input id="t" size="64" readonly /></li>
+            </ul>
+
+            <form
+                id="apply_blindings"
+                onsubmit="return show_applied_blindings()"
+            >
+                <input
+                    class="button button1"
+                    type="submit"
+                    value="Apply blindings"
+                />
+            </form>
+            <div id="blinded_values">
+                <p><b>Blinded nonce</b>: <span id="blinded_nonce"></span></p>
+                <p><b>Blinded public key</b>: <span id="blinded_publickey"></span></p>
+                <p><b>Challenge</b>: <span id="challenge"></span></p>
+            </div>
+
+            <form id="sign" onsubmit="return hit_sign()">
+                <div>
+                    <ul class="container">
+                        <li><b>Nonce</b>: <input id="usednonce_signform" size="64" readonly /></li>
+                        <li><b>Challenge</b>: <input id="challenge_signform" size="64" readonly /></li>
+                    </ul>
+
+                    <input
+                        class="button button1"
+                        type="submit"
+                        value="Sign challenge"
+                    />
+                </div>
+            </form>
+            <p><b>Blinded Signature</b>: <span id="blinded_signature"></span></p>
+
+            <form id="unblind" onsubmit="return hit_unblind()">
+                <div>
+                    <input
+                        class="button button1"
+                        type="submit"
+                        value="Unblind message"
+                    />
+                </div>
+            </form>
+            <p><b>Signature</b>: <span id="unblinded_signature"></span></p>
+
+
+            <form id="sign" onsubmit="return hit_verify()">
+                <div>
+                    <ul class="container">
+                        <li><b>Blinded Publickey</b>: <input id="blinded_pubkey_verifynform" size="64" readonly /></li>
+                        <li><b>Message</b>: <input id="message_verifynform" size="64" readonly /></li>
+                        <li><b>Signature</b>: <input id="signature_verifynform" size="64" readonly /></li>
+                        <li><b>Blinded nonce</b>: <input id="blinded_nonce_verifynform" size="64"/></li>
+                    </ul>
+
+                    <input
+                        class="button button1"
+                        type="submit"
+                        value="Verify Unblinded Signature"
+                    />
+                </div>
+            </form>
+            <p><b>Valid?</b>: <span id="blinded_signature"></span></p>
+
+
+        </div>
+    </body>
+
+    <script>
+        globalThis.paused = true;
+        const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+        show_applied_blindings();
+
+        async function hit_gennonce() {
+            while (true) {
+                reset_blind();
+                console.log(globalThis.paused);
+                if (globalThis.paused) {
+                    break;
+                }
+                var payid = fetch("/api/gennonce")
+                    .then((response) => response.json())
+                    .then(function (data) {
+                        document.getElementById("nonce").innerHTML = data.nonce;
+                        document.getElementById("usednonce_signform").value =
+                            data.nonce;
+                    });
+                await timer(1000);
+            }
+
+            return false;
+        }
+
+        function toggle_pause_nonce() {
+            if (globalThis.paused) {
+                globalThis.paused = false;
+                document.getElementById("usenonce_button").value = "Use nonce";
+                hit_gennonce();
+            } else {
+                document.getElementById("usenonce_button").value =
+                    "Generate Nonces";
+                globalThis.paused = true;
+            }
+            return false;
+        }
+
+        function reset_blind() {
+            document.getElementById("blinded_nonce").innerHTML = "";
+            document.getElementById("blinded_publickey").innerHTML = "";
+            document.getElementById("challenge").innerHTML = "";
+            document.getElementById("challenge_signform").value = "";
+            document.getElementById("alpha").value = "";
+            document.getElementById("beta").value = "";
+            document.getElementById("t").value = "";
+            hide_applied_blindings();
+        }
+
+        function hit_genblind() {
+            var payid = fetch(
+                "/api/blind?" +
+                    new URLSearchParams({
+                        nonce: document.getElementById("nonce").innerHTML,
+                        message: document.getElementById("message").value,
+                    })
+            )
+                .then((response) => response.json())
+                .then(function (data) {
+                    document.getElementById("blinded_nonce").innerHTML =
+                        data.blinded_nonce;
+                    document.getElementById("blinded_publickey").innerHTML =
+                        data.tweaked_pubkey;
+                    document.getElementById("challenge").innerHTML =
+                        data.challenge;
+                    document.getElementById("challenge_signform").value =
+                        data.challenge;
+                    document.getElementById("alpha").value = data.alpha;
+                    document.getElementById("beta").value = data.beta;
+                    document.getElementById("t").value = data.t;
+                });
+            return false;
+        }
+
+        function show_applied_blindings() {
+            document.getElementById("blinded_nonce").style.display = "inline";
+            document.getElementById("blinded_publickey").style.display =
+                "inline";
+            document.getElementById("challenge").style.display = "inline";
+            return false;
+        }
+
+        function hide_applied_blindings() {
+            document.getElementById("blinded_nonce").style.display = "none";
+            document.getElementById("blinded_publickey").style.display = "none";
+            document.getElementById("challenge").style.display = "none";
+            return false;
+        }
+
+        function hit_sign() {
+            var payid = fetch(
+                "/api/sign?" +
+                    new URLSearchParams({
+                        nonce: document.getElementById("usednonce_signform")
+                            .value,
+                        challenge:
+                            document.getElementById("challenge_signform").value,
+                    })
+            )
+                .then((response) => response.json())
+                .then(function (data) {
+                    if (data.message == "ok") {
+                        document.getElementById("blinded_signature").innerHTML =
+                            data.signature;
+                    } else {
+                        document.getElementById("blinded_signature").innerHTML =
+                            data.message;
+                    }
+                });
+            return false;
+        }
+
+        function hit_unblind() {
+            var payid = fetch(
+                "/api/unblind?" +
+                    new URLSearchParams({
+                        blindsig:
+                            document.getElementById("blinded_signature")
+                                .innerHTML,
+                        challenge: document.getElementById("challenge_signform").value,
+                        alpha: document.getElementById("alpha").value,
+                        tweak: document.getElementById("t").value,
+                    })
+            )
+                .then((response) => response.json())
+                .then(function (data) {
+                    // console.log(data);
+                    document.getElementById("unblinded_signature").innerHTML =
+                        data.signature;
+                });
+            return false;
+        }
+
+        function hit_verify() {
+            var payid = fetch(
+                "/api/verify?" +
+                    new URLSearchParams({
+                        tweaked_pubkey:
+                            document.getElementById("blinded_publickey")
+                                .innerHTML,
+                        message:
+                            document.getElementById("message").value,
+                        blinded_nonce: document.getElementById("blinded_nonce").value,
+                        signature: document.getElementById("unblinded_signature").value,
+                    })
+            )
+                .then((response) => response.json())
+                .then(function (data) {
+                    // console.log(data);
+                    document.getElementById("unblinded_signature").innerHTML =
+                        data.signature;
+                });
+            return false;
+        }
+    </script>
+</html>
