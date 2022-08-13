@@ -4,8 +4,19 @@
         <link rel="stylesheet" href="/style.css" />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+            crossorigin="anonymous"
+        />
 
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script
+            id="MathJax-script"
+            async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+        ></script>
     </head>
 
     <script></script>
@@ -15,25 +26,31 @@
             <div class="row">
                 <div class="col-md-6">
                     <h1>Server</h1>
+                    <p>The server has a private key \(x\) and public key \(X = x*G\).</p>
                     <h2>1. Generate a nonce</h2>
+                    <p>
+                        Server generates a random secret \(k\) and public nonce
+                        \(R=k*G\), and saves them.
+                    </p>
                     <form id="gennonce" onsubmit="return toggle_pause_nonce()">
                         <div>
                             <input
-                            class="button button1"
-                            type="submit"
-                            id="usenonce_button"
-                            value="Generate Nonces"
+                                class="button button1"
+                                type="submit"
+                                id="usenonce_button"
+                                value="Generate Nonces"
                             />
-                            <p><b>Nonce</b>: <span id="nonce"></span></p>
+                            <p><b>Nonce \(R\)</b>: <span id="nonce"></span></p>
                         </div>
                     </form>
                     <br />
                     <h2>4. Sign challenge</h2>
+                    <p>Request the server to produce a signature for the challenge using the nonce secret \(k\) and private key \(x\): \(s = k + c'*x\).</p>
                     <form id="sign" onsubmit="return hit_sign()">
                         <div>
                             <ul class="container">
                                 <li>
-                                    <b>Nonce</b>:
+                                    <b>Public Nonce \(R\)</b>:
                                     <input
                                         id="usednonce_signform"
                                         class="form-control w-100"
@@ -41,7 +58,7 @@
                                     />
                                 </li>
                                 <li>
-                                    <b>Challenge</b>:
+                                    <b>Challenge \(c'\)</b>:
                                     <input
                                         id="challenge_signform"
                                         class="form-control w-100"
@@ -49,7 +66,6 @@
                                     />
                                 </li>
                             </ul>
-
                             <input
                                 class="button button1"
                                 type="submit"
@@ -58,7 +74,7 @@
                         </div>
                     </form>
                     <p>
-                        <b>Blinded Signature</b>:
+                        <b>Signature \(s\)</b>:
                         <span id="blinded_signature"></span>
                     </p>
                 </div>
@@ -66,17 +82,22 @@
                 <div class="col-md-6">
                     <h1>User</h1>
                     <h2>2. Generate blindings</h2>
+                    <p>
+                        Choose a message \(m\) and generate three random scalar values \(\alpha, \beta,
+                        t\). 
+                        <br>
+                        These scalars will used to blind (disguise) what we
+                        request the server to sign.
+                    </p>
                     <form id="blind" onsubmit="return hit_genblind()">
                         <div>
-                            <!-- <label>Nonce:</label>
-                        <input id="usednonce_blindform" name="nonce" value="" /> -->
-                            <label><b>Message</b>:</label>
+                            <label><b>Message \(m\)</b>:</label>
                             <input
                                 style="display: inline"
                                 class="form-control w-50"
                                 name="message"
                                 id="message"
-                                placeholder="enter your message here"
+                                placeholder="Enter your message here"
                                 required
                             />
                             <input
@@ -86,21 +107,35 @@
                             />
                         </div>
                     </form>
-                    <!-- <p>Choosing three random values:</p> -->
+                    <br>
+                    <p>Blinding values:</p>
                     <ul class="container">
                         <li>
-                            <b>alpha</b>:
-                            <input id="alpha" class="form-control w-100" readonly />
+                            <b>\(\alpha\)</b>:
+                            <input
+                                id="alpha"
+                                class="form-control w-100"
+                                readonly
+                            />
                         </li>
                         <li>
-                            <b>beta</b>:
-                            <input id="beta" class="form-control w-100" readonly />
+                            <b>\(\beta\)</b>:
+                            <input
+                                id="beta"
+                                class="form-control w-100"
+                                readonly
+                            />
                         </li>
                         <li>
-                            <b>t</b>: <input id="t" class="form-control w-100" readonly />
+                            <b>\(t\)</b>:
+                            <input id="t" class="form-control w-100" readonly />
                         </li>
                     </ul>
                     <h2>3. Apply blindings</h2>
+                    <p>Blind the nonce \(R' = R + \alpha*G + \beta*X\).</p>
+                    <p>Blind the public key \(X' = X + t*G\).</p>
+                    <p>For a message \(m\) create a challenge \(c = H(X', R', m)\) using a hash function \(H\), then blind it \(c' = c + \beta\).</p>
+
                     <form
                         id="apply_blindings"
                         onsubmit="return hit_apply_bindings()"
@@ -111,19 +146,21 @@
                             value="Apply blindings"
                         />
                     </form>
+                    <br>
                     <div id="blinded_values">
                         <p>
-                            <b>Blinded nonce</b>:
+                            <b>Blinded nonce \(R'\)</b>:
                             <span id="blinded_nonce"></span>
                         </p>
                         <p>
-                            <b>Blinded public key</b>:
+                            <b>Blinded pubkey \(X'\)</b>:
                             <span id="blinded_publickey"></span>
                         </p>
-                        <p><b>Challenge</b>: <span id="challenge"></span></p>
+                        <p><b>Challenge \(c'\)</b>: <span id="challenge"></span></p>
                     </div>
 
                     <h2>5. Unblind signature</h2>
+                    <p>Use the blinding values to get the tweaked signature \(s' = s + \alpha + c*t\).</p>
                     <form id="unblind" onsubmit="return hit_unblind()">
                         <div>
                             <input
@@ -133,8 +170,9 @@
                             />
                         </div>
                     </form>
+                    <br>
                     <p>
-                        <b>Signature</b>: <span id="unblinded_signature"></span>
+                        <b>Signature \(s'\)</b>: <span id="unblinded_signature"></span>
                     </p>
                 </div>
             </div>
@@ -143,6 +181,9 @@
                 <div class="col-md-6">
                     <!-- <h1>Verify Signature</h1> -->
                     <h2>6. Verify signature</h2>
+                    <p>Verify that the signature-nonce pair \((s', R)\) solves the schnorr verification equation \(s' * G = R' + c*X'\). 
+                        <br>(see proof below)
+                    </p>
                     <form id="verify" onsubmit="return hit_verify()">
                         <div>
                             <ul class="container">
@@ -187,6 +228,23 @@
                         </div>
                     </form>
                     <p><b>Valid?</b>: <span id="verify_success"></span></p>
+                    Prove \((s', R')\) solves the schnorr verification equation \((s' * G = R' + c*X')\) for challenge \(c\) under public key \(X'\):
+                    <p>Starting with the unblinded signature:
+                        $$\begin{aligned} s' &= s + \alpha + c * t
+                        \\ &= (k + c'*x) + \alpha + c * t
+                        \\ &= k + (c+\beta)*x + \alpha + c * t
+                        \\ &= (k + \alpha + \beta*x) + c*(x + t)
+                        \end{aligned}$$
+                        
+                        Hence
+                        $$\begin{aligned} s'*G &= ((k + \alpha + \beta*x) + c*(x + t))*G
+                        \\ &= (k + \alpha + \beta*x)*G + c*(x + t)*G
+                        \\ &= k*G + \alpha*G + \beta*(x*G) + c*((x*G) + (t*G))
+                        \\ &= (R + \alpha*G + \beta*X) + c*(X + (t*G))
+                        \\ &= R' + c*X'
+                        \end{aligned}$$
+
+                    </p>
                 </div>
             </div>
         </div>
