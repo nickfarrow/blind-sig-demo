@@ -1,6 +1,31 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!-- Primary Meta Tags -->
+        <title>Blind Schnorr Signature Interactive Demo</title>
+        <meta name="title" content="Blind Schnorr Signature Interactive Demo" />
+        <meta name="description" content="https://blindsigs.utxo.club/header.png" />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://blindsigs.utxo.club/" />
+        <meta
+            property="og:title"
+            content="Blind Schnorr Signature Interactive Demo"
+        />
+        <meta property="og:description" content="" />
+        <meta property="og:image" content="https://blindsigs.utxo.club/header.png" />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://blindsigs.utxo.club/" />
+        <meta
+            property="twitter:title"
+            content="Blind Schnorr Signature Interactive Demo"
+        />
+        <meta property="twitter:description" content="" />
+        <meta property="twitter:image" content="https://blindsigs.utxo.club/header.png" />
+
         <link rel="stylesheet" href="/style.css" />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -26,7 +51,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <h1>Server</h1>
-                    <p>The server has a private key \(x\) and public key \(X = x*G\).</p>
+                    <p>
+                        The server has a private key \(x\) and public key \(X =
+                        x*G\).
+                    </p>
                     <h2>1. Generate a nonce</h2>
                     <p>
                         Server generates a random secret \(k\) and public nonce
@@ -45,7 +73,11 @@
                     </form>
                     <br />
                     <h2>4. Sign challenge</h2>
-                    <p>Request the server to produce a signature for the challenge using the nonce secret \(k\) and private key \(x\): \(s = k + c'*x\).</p>
+                    <p>
+                        Request the server to produce a signature for the
+                        challenge using the nonce secret \(k\) and private key
+                        \(x\): \(s = k + c'*x\).
+                    </p>
                     <form id="sign" onsubmit="return hit_sign()">
                         <div>
                             <ul class="container">
@@ -83,9 +115,9 @@
                     <h1>User</h1>
                     <h2>2. Generate blindings</h2>
                     <p>
-                        Choose a message \(m\) and generate three random scalar values \(\alpha, \beta,
-                        t\). 
-                        <br>
+                        Choose a message \(m\) and generate three random scalar
+                        values \(\alpha, \beta, t\).
+                        <br />
                         These scalars will used to blind (disguise) what we
                         request the server to sign.
                     </p>
@@ -107,7 +139,7 @@
                             />
                         </div>
                     </form>
-                    <br>
+                    <br />
                     <p>Blinding values:</p>
                     <ul class="container">
                         <li>
@@ -134,7 +166,11 @@
                     <h2>3. Apply blindings</h2>
                     <p>Blind the nonce \(R' = R + \alpha*G + \beta*X\).</p>
                     <p>Blind the public key \(X' = X + t*G\).</p>
-                    <p>For a message \(m\) create a challenge \(c = H(X', R', m)\) using a hash function \(H\), then blind it \(c' = c + \beta\).</p>
+                    <p>
+                        For a message \(m\) create a challenge \(c = H(X', R',
+                        m)\) using a hash function \(H\), then blind it \(c' = c
+                        + \beta\).
+                    </p>
 
                     <form
                         id="apply_blindings"
@@ -146,7 +182,7 @@
                             value="Apply blindings"
                         />
                     </form>
-                    <br>
+                    <br />
                     <div id="blinded_values">
                         <p>
                             <b>Blinded nonce \(R'\)</b>:
@@ -156,11 +192,17 @@
                             <b>Blinded pubkey \(X'\)</b>:
                             <span id="blinded_publickey"></span>
                         </p>
-                        <p><b>Challenge \(c'\)</b>: <span id="challenge"></span></p>
+                        <p>
+                            <b>Challenge \(c'\)</b>:
+                            <span id="challenge"></span>
+                        </p>
                     </div>
 
                     <h2>5. Unblind signature</h2>
-                    <p>Use the blinding values to get the tweaked signature \(s' = s + \alpha + c*t\).</p>
+                    <p>
+                        Use the blinding values to get the tweaked signature
+                        \(s' = s + \alpha + c*t\).
+                    </p>
                     <form id="unblind" onsubmit="return hit_unblind()">
                         <div>
                             <input
@@ -170,9 +212,10 @@
                             />
                         </div>
                     </form>
-                    <br>
+                    <br />
                     <p>
-                        <b>Signature \(s'\)</b>: <span id="unblinded_signature"></span>
+                        <b>Signature \(s'\)</b>:
+                        <span id="unblinded_signature"></span>
                     </p>
                 </div>
             </div>
@@ -181,8 +224,10 @@
                 <div class="col-md-6">
                     <!-- <h1>Verify Signature</h1> -->
                     <h2>6. Verify signature</h2>
-                    <p>Verify that the signature-nonce pair \((s', R)\) solves the schnorr verification equation \(s' * G = R' + c*X'\). 
-                        <br>(see proof below)
+                    <p>
+                        Verify that the signature-nonce pair \((s', R)\) solves
+                        the schnorr verification equation \(s' * G = R' +
+                        c*X'\). <br />(see proof below)
                     </p>
                     <form id="verify" onsubmit="return hit_verify()">
                         <div>
@@ -228,7 +273,9 @@
                         </div>
                     </form>
                     <p><b>Valid?</b>: <span id="verify_success"></span></p>
-                    Prove \((s', R')\) solves the schnorr verification equation \((s' * G = R' + c*X')\) for challenge \(c\) under public key \(X'\):
+                    Prove \((s', R')\) solves the schnorr verification equation
+                    \((s' * G = R' + c*X')\) for challenge \(c\) under public
+                    key \(X'\):
                     <p>Starting with the unblinded signature:
                         $$\begin{aligned} s' &= s + \alpha + c * t
                         \\ &= (k + c'*x) + \alpha + c * t
@@ -243,7 +290,6 @@
                         \\ &= (R + \alpha*G + \beta*X) + c*(X + (t*G))
                         \\ &= R' + c*X'
                         \end{aligned}$$
-
                     </p>
                 </div>
             </div>
