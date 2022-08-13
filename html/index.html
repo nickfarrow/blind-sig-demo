@@ -2,134 +2,193 @@
 <html>
     <head>
         <link rel="stylesheet" href="/style.css" />
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
     </head>
 
     <script></script>
 
     <body>
-        <div>
-            <form id="gennonce" onsubmit="return toggle_pause_nonce()">
-                <div>
-                    <p><b>Nonce</b>: <span id="nonce"></span></p>
-                    <input
-                        class="button button1"
-                        type="submit"
-                        id="usenonce_button"
-                        value="Generate Nonces"
-                    />
-                </div>
-            </form>
-            <br />
-            <form id="blind" onsubmit="return hit_genblind()">
-                <div>
-                    <!-- <label>Nonce:</label>
-                    <input id="usednonce_blindform" name="nonce" value="" /> -->
-                    <label><b>Message</b>:</label>
-                    <input
-                        style="display: inline"
-                        name="message"
-                        id="message"
-                        placeholder="enter your message here"
-                        required
-                    />
-                    <input
-                        class="button button1"
-                        type="submit"
-                        value="Generate blinding values"
-                    />
-                </div>
-            </form>
-            <!-- <p>Choosing three random values:</p> -->
-            <ul class="container">
-                <li><b>alpha</b>: <input id="alpha" size="64" readonly /></li>
-                <li><b>beta</b>: <input id="beta" size="64" readonly /></li>
-                <li><b>t</b>: <input id="t" size="64" readonly /></li>
-            </ul>
-
-            <form id="apply_blindings" onsubmit="return hit_apply_bindings()">
-                <input
-                    class="button button1"
-                    type="submit"
-                    value="Apply blindings"
-                />
-            </form>
-            <div id="blinded_values">
-                <p><b>Blinded nonce</b>: <span id="blinded_nonce"></span></p>
-                <p>
-                    <b>Blinded public key</b>:
-                    <span id="blinded_publickey"></span>
-                </p>
-                <p><b>Challenge</b>: <span id="challenge"></span></p>
-            </div>
-
-            <form id="sign" onsubmit="return hit_sign()">
-                <div>
-                    <ul class="container">
-                        <li>
-                            <b>Nonce</b>:
-                            <input id="usednonce_signform" size="64" readonly />
-                        </li>
-                        <li>
-                            <b>Challenge</b>:
-                            <input id="challenge_signform" size="64" readonly />
-                        </li>
-                    </ul>
-
-                    <input
-                        class="button button1"
-                        type="submit"
-                        value="Sign challenge"
-                    />
-                </div>
-            </form>
-            <p>
-                <b>Blinded Signature</b>: <span id="blinded_signature"></span>
-            </p>
-
-            <form id="unblind" onsubmit="return hit_unblind()">
-                <div>
-                    <input
-                        class="button button1"
-                        type="submit"
-                        value="Unblind message"
-                    />
-                </div>
-            </form>
-            <p><b>Signature</b>: <span id="unblinded_signature"></span></p>
-
-            <form id="verify" onsubmit="return hit_verify()">
-                <div>
-                    <ul class="container">
-                        <li>
-                            <b>Blinded Publickey</b>:
-                            <input id="blinded_pubkey_verifyform" size="64" />
-                        </li>
-                        <li>
-                            <b>Message</b>:
-                            <input id="message_verifyform" size="64" readonly />
-                        </li>
-                        <li>
-                            <b>Signature</b>:
-                            <input id="signature_verifyform" size="64" />
-                        </li>
-                        <li>
-                            <b>Blinded nonce</b>:
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <h1>Server</h1>
+                    <h2>1. Generate a nonce</h2>
+                    <form id="gennonce" onsubmit="return toggle_pause_nonce()">
+                        <div>
                             <input
-                                id="blinded_nonce_verifyform"
-                                size="64"
-                                readonly
+                            class="button button1"
+                            type="submit"
+                            id="usenonce_button"
+                            value="Generate Nonces"
                             />
+                            <p><b>Nonce</b>: <span id="nonce"></span></p>
+                        </div>
+                    </form>
+                    <br />
+                    <h2>4. Sign challenge</h2>
+                    <form id="sign" onsubmit="return hit_sign()">
+                        <div>
+                            <ul class="container">
+                                <li>
+                                    <b>Nonce</b>:
+                                    <input
+                                        id="usednonce_signform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                                <li>
+                                    <b>Challenge</b>:
+                                    <input
+                                        id="challenge_signform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                            </ul>
+
+                            <input
+                                class="button button1"
+                                type="submit"
+                                value="Sign challenge"
+                            />
+                        </div>
+                    </form>
+                    <p>
+                        <b>Blinded Signature</b>:
+                        <span id="blinded_signature"></span>
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <h1>User</h1>
+                    <h2>2. Generate blindings</h2>
+                    <form id="blind" onsubmit="return hit_genblind()">
+                        <div>
+                            <!-- <label>Nonce:</label>
+                        <input id="usednonce_blindform" name="nonce" value="" /> -->
+                            <label><b>Message</b>:</label>
+                            <input
+                                style="display: inline"
+                                class="form-control w-50"
+                                name="message"
+                                id="message"
+                                placeholder="enter your message here"
+                                required
+                            />
+                            <input
+                                class="button button1"
+                                type="submit"
+                                value="Generate blinding values"
+                            />
+                        </div>
+                    </form>
+                    <!-- <p>Choosing three random values:</p> -->
+                    <ul class="container">
+                        <li>
+                            <b>alpha</b>:
+                            <input id="alpha" class="form-control w-100" readonly />
+                        </li>
+                        <li>
+                            <b>beta</b>:
+                            <input id="beta" class="form-control w-100" readonly />
+                        </li>
+                        <li>
+                            <b>t</b>: <input id="t" class="form-control w-100" readonly />
                         </li>
                     </ul>
+                    <h2>3. Apply blindings</h2>
+                    <form
+                        id="apply_blindings"
+                        onsubmit="return hit_apply_bindings()"
+                    >
+                        <input
+                            class="button button1"
+                            type="submit"
+                            value="Apply blindings"
+                        />
+                    </form>
+                    <div id="blinded_values">
+                        <p>
+                            <b>Blinded nonce</b>:
+                            <span id="blinded_nonce"></span>
+                        </p>
+                        <p>
+                            <b>Blinded public key</b>:
+                            <span id="blinded_publickey"></span>
+                        </p>
+                        <p><b>Challenge</b>: <span id="challenge"></span></p>
+                    </div>
 
-                    <input
-                        class="button button1"
-                        type="submit"
-                        value="Verify Unblinded Signature"
-                    />
+                    <h2>5. Unblind signature</h2>
+                    <form id="unblind" onsubmit="return hit_unblind()">
+                        <div>
+                            <input
+                                class="button button1"
+                                type="submit"
+                                value="Unblind signature"
+                            />
+                        </div>
+                    </form>
+                    <p>
+                        <b>Signature</b>: <span id="unblinded_signature"></span>
+                    </p>
                 </div>
-            </form>
-            <p><b>Valid?</b>: <span id="verify_success"></span></p>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- <h1>Verify Signature</h1> -->
+                    <h2>6. Verify signature</h2>
+                    <form id="verify" onsubmit="return hit_verify()">
+                        <div>
+                            <ul class="container">
+                                <li>
+                                    <b>Blinded Publickey</b>:
+                                    <input
+                                        id="blinded_pubkey_verifyform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                                <li>
+                                    <b>Message</b>:
+                                    <input
+                                        id="message_verifyform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                                <li>
+                                    <b>Signature</b>:
+                                    <input
+                                        id="signature_verifyform"
+                                        class="form-control w-100"
+                                    />
+                                </li>
+                                <li>
+                                    <b>Blinded nonce</b>:
+                                    <input
+                                        id="blinded_nonce_verifyform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                            </ul>
+
+                            <input
+                                class="button button1"
+                                type="submit"
+                                value="Verify Unblinded Signature"
+                            />
+                        </div>
+                    </form>
+                    <p><b>Valid?</b>: <span id="verify_success"></span></p>
+                </div>
+            </div>
         </div>
     </body>
     <script type="text/javascript" src="script.js"></script>

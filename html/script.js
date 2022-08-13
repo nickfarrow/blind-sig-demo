@@ -14,7 +14,7 @@ hide_applied_blindings();
 async function hit_gennonce() {
     while (true) {
         reset_blind();
-        console.log(globalThis.paused);
+        // console.log(globalThis.paused);
         if (globalThis.paused) {
             break;
         }
@@ -161,7 +161,7 @@ function hit_verify() {
     )
         .then((response) => response.json())
         .then(function (data) {
-            console.log(data);
+            // console.log(data);
             if (data.valid) {
                 document.getElementById("verify_success").innerHTML =
                     "Valid signature :)";
