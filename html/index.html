@@ -48,14 +48,16 @@
 
     <body>
         <div class="container-fluid">
+            <h1>Blind Schnorr Signature Interactive Demo</h1>
+            <p>See this <a href="https://suredbits.com/schnorr-applications-blind-signatures/" target="_blank">fantastic article</a> for an intro on blind signatures.</p>
             <div class="row">
                 <div class="col-md-6">
-                    <h1>Server</h1>
+                    <h2>Server</h2>
                     <p>
                         The server has a private key \(x\) and public key \(X =
                         x*G\).
                     </p>
-                    <h2>1. Generate a nonce</h2>
+                    <h3>1. Generate a nonce</h3>
                     <p>
                         Server generates a random secret \(k\) and public nonce
                         \(R=k*G\), and saves them.
@@ -72,7 +74,7 @@
                         </div>
                     </form>
                     <br />
-                    <h2>4. Sign challenge</h2>
+                    <h3>4. Sign challenge</h3>
                     <p>
                         Request the server to produce a signature for the
                         challenge using the nonce secret \(k\) and private key
@@ -112,8 +114,8 @@
                 </div>
 
                 <div class="col-md-6">
-                    <h1>User</h1>
-                    <h2>2. Generate blindings</h2>
+                    <h2>User</h2>
+                    <h3>2. Generate blindings</h3>
                     <p>
                         Choose a message \(m\) and generate three random scalar
                         values \(\alpha, \beta, t\).
@@ -163,7 +165,7 @@
                             <input id="t" class="form-control w-100" readonly />
                         </li>
                     </ul>
-                    <h2>3. Apply blindings</h2>
+                    <h3>3. Apply blindings</h3>
                     <p>Blind the nonce \(R' = R + \alpha*G + \beta*X\).</p>
                     <p>Blind the public key \(X' = X + t*G\).</p>
                     <p>
@@ -198,7 +200,7 @@
                         </p>
                     </div>
 
-                    <h2>5. Unblind signature</h2>
+                    <h3>5. Unblind signature</h3>
                     <p>
                         Use the blinding values to get the tweaked signature
                         \(s' = s + \alpha + c*t\).
@@ -223,7 +225,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <!-- <h1>Verify Signature</h1> -->
-                    <h2>6. Verify signature</h2>
+                    <h3>6. Verify signature</h3>
                     <p>
                         Verify that the signature-nonce pair \((s', R)\) solves
                         the schnorr verification equation \(s' * G = R' +
