@@ -27,7 +27,10 @@
         <meta property="twitter:description" content="" />
         <meta property="twitter:image" content="https://blindsigs.utxo.club/header.png" />
 
+        <!-- Style! -->
         <link rel="stylesheet" href="/style.css" />
+
+        <!-- bootstrap and latex -->
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
             rel="stylesheet"
@@ -45,6 +48,8 @@
             async
             src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
         ></script>
+
+        <!-- my garbage js is in a script down the bottom -->
     </head>
 
     <body>
@@ -248,7 +253,7 @@
                     <!-- <h1>Verify Signature</h1> -->
                     <h3>6. Verify signature</h3>
                     <p>
-                        Anyone can now verify that the signature-nonce pair \((s', R)\) solves
+                        Once the user shares this signature-nonce pair, anyone can now verify that the signature-nonce pair \((s', R)\) solves
                         the schnorr verification equation \(s' * G = R' +
                         c*X'\) for some message \(m\) (see proof below).
                         <br>
