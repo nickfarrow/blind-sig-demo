@@ -310,10 +310,11 @@
                     <!-- <h1>Verify Signature</h1> -->
                     <h3>6. Verify signature</h3>
                     <p>
-                        Once the user shares this signature-nonce pair, anyone
-                        can now verify that the signature-nonce pair \((s', R)\)
-                        solves the schnorr verification equation \(s' * G = R' +
-                        c*X'\) for some message \(m\) (see proof below).
+                        Once the user shares this signature-nonce pair \((s',
+                        R)\), anyone can verify it solves the schnorr
+                        verification equation \(s' * G = R' + c*X'\) for some
+                        challenge \(c\) belonging to message \(m\).
+                        <br />
                         <br />
                         Most importantly,
                         <b>the server has no way of correlating</b> this
