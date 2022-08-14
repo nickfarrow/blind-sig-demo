@@ -7,7 +7,7 @@
         <meta name="title" content="Blind Schnorr Signature Interactive Demo" />
         <meta
             name="description"
-            content="https://blindsigs.utxo.club/header.png"
+            content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers which can act as a coordinator while remaining blind to user activity. Click through the steps!"
         />
 
         <!-- Open Graph / Facebook -->
@@ -17,7 +17,10 @@
             property="og:title"
             content="Blind Schnorr Signature Interactive Demo"
         />
-        <meta property="og:description" content="" />
+        <meta
+            property="og:description"
+            content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers which can act as a coordinator while remaining blind to user activity. Click through the steps!"
+        />
         <meta
             property="og:image"
             content="https://blindsigs.utxo.club/header.png"
@@ -30,7 +33,10 @@
             property="twitter:title"
             content="Blind Schnorr Signature Interactive Demo"
         />
-        <meta property="twitter:description" content="" />
+        <meta
+            property="twitter:description"
+            content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers which can act as a coordinator while remaining blind to user activity. Click through the steps!"
+        />
         <meta
             property="twitter:image"
             content="https://blindsigs.utxo.club/header.png"
@@ -94,8 +100,8 @@
             is valid for the original message that is completely uncorrelated to
             what the server was asked to sign.
             <b>Blind signatures are powerful for protecting user privacy</b>,
-            where a server can act as an authority/coordinator while remaining blind to the
-            exact activity occuring.
+            where a server can act as an authority/coordinator while remaining
+            blind to the exact activity occuring.
             <br />
             <br />
             See this
@@ -123,9 +129,11 @@
                     <p>
                         The server has a private key \(x\) and public key \(X =
                         x*G\).
-                        <br>
+                        <br />
                         <small>
-                            (\(G\) is the generator point of an elliptic curve - basically all you need to know is that it is impossible to find \(x\) from knowing \(X\)).
+                            (\(G\) is the generator point of an elliptic curve -
+                            basically all you need to know is that it is
+                            impossible to find \(x\) from knowing \(X\)).
                         </small>
                     </p>
                     <h3>1. Generate a nonce</h3>
@@ -381,6 +389,7 @@
                         Reveal proof
                     </button>
                     <div class="collapse" id="proof">
+                        <!-- prettier-ignore -->
                         <div class="card card-body">Starting with the blinded signature:
                             $$\begin{aligned} s' &= s + \alpha + c * t
                             \\ &= (k + c'*x) + \alpha + c * t
