@@ -5,7 +5,10 @@
         <!-- Primary Meta Tags -->
         <title>Blind Schnorr Signature Interactive Demo</title>
         <meta name="title" content="Blind Schnorr Signature Interactive Demo" />
-        <meta name="description" content="https://blindsigs.utxo.club/header.png" />
+        <meta
+            name="description"
+            content="https://blindsigs.utxo.club/header.png"
+        />
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website" />
@@ -15,7 +18,10 @@
             content="Blind Schnorr Signature Interactive Demo"
         />
         <meta property="og:description" content="" />
-        <meta property="og:image" content="https://blindsigs.utxo.club/header.png" />
+        <meta
+            property="og:image"
+            content="https://blindsigs.utxo.club/header.png"
+        />
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image" />
@@ -25,7 +31,10 @@
             content="Blind Schnorr Signature Interactive Demo"
         />
         <meta property="twitter:description" content="" />
-        <meta property="twitter:image" content="https://blindsigs.utxo.club/header.png" />
+        <meta
+            property="twitter:image"
+            content="https://blindsigs.utxo.club/header.png"
+        />
 
         <!-- Style! -->
         <link rel="stylesheet" href="/style.css" />
@@ -38,9 +47,21 @@
             integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
             crossorigin="anonymous"
         />
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script
+            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"
+        ></script>
 
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
         <script
@@ -55,26 +76,49 @@
     <body>
         <div class="container-fluid">
             <h1>Blind Schnorr Signature Interactive Demo</h1>
-            <p>
-                <b>What are blind signatures?</b>
-                <br>
-                With regular <a href="https://en.wikipedia.org/wiki/Schnorr_signature" target="_blank">schnorr signatures</a>, some <i>message</i> is used to create a <i>challenge</i> which is then signed using a <i>private key</i> and a <i>nonce</i>.
-                <br>
-                <br>
-                Blind signatures allow for a user to disguise a message and then request a server to sign this disguised message. 
-                The user can then take this signature and unblind it, resulting in an signature that is valid for the original message.
-                <b>Blind signatures are powerful for protecting user privacy</b>, where a server can act as an authority while remaining blind to the exact activity occuring.
-                <br>
-                <br>
-                See this <a href="https://suredbits.com/schnorr-applications-blind-signatures/" target="_blank">fantastic article</a> by Nadav for an intro on blind signatures and some motivations for the mathematics.
-                <br>
-                <h3>Follow the numbers 1-6</h3> 
-                Get an idea for how blind schnorr signatures work. Actions taken by the <b>signing server</b> are on the left, and <b>user</b>'s are on the right.
-            </p>
-            <br>
-            <br>
+            <b>What are blind signatures?</b>
+            <br />
+            With regular
+            <a
+                href="https://en.wikipedia.org/wiki/Schnorr_signature"
+                target="_blank"
+                >schnorr signatures</a
+            >, a <i>private key</i> and <i>nonce</i> are used to sign a
+            <i>challenge</i> for a <i>message</i>. The signature-nonce pair can
+            then be verified against the signer's <i>public key</i>.
+            <br />
+            <br />
+            Blind signatures allow for a user to disguise a message and then
+            request a server to sign this disguised message. The user can then
+            take this signature and unblind it, resulting in an signature that
+            is valid for the original message that is completely uncorrelated to
+            what the server was asked to sign.
+            <b>Blind signatures are powerful for protecting user privacy</b>,
+            where a server can act as an authority/coordinator while remaining blind to the
+            exact activity occuring.
+            <br />
+            <br />
+            See this
+            <a
+                href="https://suredbits.com/schnorr-applications-blind-signatures/"
+                target="_blank"
+                >fantastic article</a
+            >
+            by Nadav for an intro on blind signatures and some motivations for
+            the mathematics.
+            <br />
+            <br />
+            <h3>Follow the numbers 1-6</h3>
+            Get an idea for how blind schnorr signatures work. Actions taken by
+            the <b>signing server</b> are on the left, and <b>user</b>'s are on
+            the right.
+            <br />
+            <br />
             <div class="row">
-                <div class="col-md-6" style="padding-right:1%;border-right: 3px double #000000;">
+                <div
+                    class="col-md-6"
+                    style="padding-right: 1%; border-right: 3px double #000000"
+                >
                     <h2><b>Server</b></h2>
                     <p>
                         The server has a private key \(x\) and public key \(X =
@@ -96,12 +140,13 @@
                             <p><b>Nonce \(R\)</b>: <span id="nonce"></span></p>
                         </div>
                     </form>
-                    <br>
+                    <br />
                     <h3>4. Sign challenge</h3>
                     <p>
                         Request the server to produce a signature for the
-                        challenge using the nonce secret \(k\) and private key \(x\)
-                        <br>
+                        challenge using the nonce secret \(k\) and private key
+                        \(x\)
+                        <br />
                         \(s = k + c'*x\).
                     </p>
                     <form id="sign" onsubmit="return hit_sign()">
@@ -246,18 +291,22 @@
                 </div>
             </div>
             <br />
-            <hr>
+            <hr />
             <br />
             <div class="row">
                 <div class="col-md-6">
                     <!-- <h1>Verify Signature</h1> -->
                     <h3>6. Verify signature</h3>
                     <p>
-                        Once the user shares this signature-nonce pair, anyone can now verify that the signature-nonce pair \((s', R)\) solves
-                        the schnorr verification equation \(s' * G = R' +
+                        Once the user shares this signature-nonce pair, anyone
+                        can now verify that the signature-nonce pair \((s', R)\)
+                        solves the schnorr verification equation \(s' * G = R' +
                         c*X'\) for some message \(m\) (see proof below).
-                        <br>
-                        Most importantly, <b>the server has no way of correlating</b> this signature-nonce pair with the challenge and nonce they signed with earlier.</b>
+                        <br />
+                        Most importantly,
+                        <b>the server has no way of correlating</b> this
+                        signature-nonce pair with the challenge and nonce they
+                        signed with earlier.
                     </p>
                     <form id="verify" onsubmit="return hit_verify()">
                         <div>
@@ -304,18 +353,27 @@
                         </div>
                     </form>
                     <p><b>Valid?</b>: <span id="verify_success"></span></p>
-                    </div>
-                    <div class="col-md-6">
+                </div>
+                <div class="col-md-6">
                     <h3>Schnorr Verification Equation</h3>
                     <p>
-                    Prove \((s', R')\) solves the schnorr verification equation
-                    \((s' * G = R' + c*X')\) for challenge \(c\) under public
-                    key \(X'\).
+                        Prove \((s', R')\) solves the schnorr verification
+                        equation \((s' * G = R' + c*X')\) for challenge \(c\)
+                        under public key \(X'\).
                     </p>
-                    <small>Hint: Expand \(s'\) from definitions (plug and chug algebra)</small>
-                    <br>
-                    <br>
-                    <button type="button button1" data-toggle="collapse" data-target="#proof" aria-expanded="false" aria-controls="proof">
+                    <small
+                        >Hint: Expand \(s'\) from definitions (plug and chug
+                        algebra)</small
+                    >
+                    <br />
+                    <br />
+                    <button
+                        type="button button1"
+                        data-toggle="collapse"
+                        data-target="#proof"
+                        aria-expanded="false"
+                        aria-controls="proof"
+                    >
                         Reveal proof
                     </button>
                     <div class="collapse" id="proof">
@@ -335,9 +393,9 @@
                             \end{aligned}$$
                         </div>
                     </div>
-                    <br>
-                    <br>
-                    <br>
+                    <br />
+                    <br />
+                    <br />
                 </div>
             </div>
         </div>
