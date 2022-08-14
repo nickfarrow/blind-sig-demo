@@ -307,21 +307,21 @@
                     \((s' * G = R' + c*X')\) for challenge \(c\) under public
                     key \(X'\).
                     </p>
-                    <small>Hint: Expand \(s'\) from definitions and chug away</small>
+                    <small>Hint: Expand \(s'\) from definitions (plug and chug algebra)</small>
                     <br>
                     <br>
                     <button type="button button1" data-toggle="collapse" data-target="#proof" aria-expanded="false" aria-controls="proof">
                         Reveal proof
                     </button>
                     <div class="collapse" id="proof">
-                        <div class="card card-body">Starting with the unblinded signature:
+                        <div class="card card-body">Starting with the blinded signature:
                             $$\begin{aligned} s' &= s + \alpha + c * t
                             \\ &= (k + c'*x) + \alpha + c * t
                             \\ &= k + (c+\beta)*x + \alpha + c * t
                             \\ &= (k + \alpha + \beta*x) + c*(x + t)
                             \end{aligned}$$
                             
-                            Hence
+                            so
                             $$\begin{aligned} s'*G &= ((k + \alpha + \beta*x) + c*(x + t))*G
                             \\ &= (k + \alpha + \beta*x)*G + c*(x + t)*G
                             \\ &= k*G + \alpha*G + \beta*(x*G) + c*((x*G) + (t*G))
