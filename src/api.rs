@@ -85,6 +85,14 @@ async fn delete_nonce_secret(
         .await
 }
 
+async fn save_message(conn: &mut SqliteConnection, message: String) {
+    sqlx::query("INSERT INTO messages VALUES (?)")
+        .bind(message)
+        .execute(conn)
+        .await
+        .expect("stored message ok");
+}
+
 #[derive(Serialize, Debug)]
 pub struct NonceResponse {
     nonce: String,
@@ -125,7 +133,11 @@ pub struct BlindSession {
 }
 
 #[get("/blind?<message>&<nonce>")]
-pub async fn blind(message: String, nonce: String) -> Json<BlindSession> {
+pub async fn blind(
+    mut pool: Connection<Main>,
+    message: String,
+    nonce: String,
+) -> Json<BlindSession> {
     let nonce_gen = nonce::Synthetic::<Sha256, nonce::GlobalRng<ThreadRng>>::default();
     let schnorr = Schnorr::<Sha256, _>::new(nonce_gen.clone());
 
@@ -137,6 +149,10 @@ pub async fn blind(message: String, nonce: String) -> Json<BlindSession> {
         schnorr,
         &mut rand::thread_rng(),
     );
+
+    let mut txn = pool.begin().await.unwrap();
+    save_message(&mut *txn, message.clone()).await;
+    txn.commit().await.unwrap();
 
     Json(BlindSession {
         tweaked_pubkey: blind_session.tweaked_pubkey.to_string(),
