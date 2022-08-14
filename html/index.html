@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8" />
         <!-- Primary Meta Tags -->
         <title>Blind Schnorr Signature Interactive Demo</title>
         <meta name="title" content="Blind Schnorr Signature Interactive Demo" />
@@ -27,7 +28,6 @@
         <meta property="twitter:image" content="https://blindsigs.utxo.club/header.png" />
 
         <link rel="stylesheet" href="/style.css" />
-        <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
             rel="stylesheet"
@@ -36,8 +36,8 @@
             crossorigin="anonymous"
         />
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
         <script
@@ -61,7 +61,7 @@
                 <b>Blind signatures are powerful for protecting user privacy</b>, where a server can act as an authority while remaining blind to the exact activity occuring.
                 <br>
                 <br>
-                See this <a href="https://suredbits.com/schnorr-applications-blind-signatures/" target="_blank">fantastic article</a> for an intro on blind signatures and some motivations for the mathematics.
+                See this <a href="https://suredbits.com/schnorr-applications-blind-signatures/" target="_blank">fantastic article</a> by Nadav for an intro on blind signatures and some motivations for the mathematics.
                 <br>
                 <h3>Follow the numbers 1-6</h3> 
                 Get an idea for how blind schnorr signatures work. Actions taken by the <b>signing server</b> are on the left, and <b>user</b>'s are on the right.
@@ -241,14 +241,18 @@
                 </div>
             </div>
             <br />
+            <hr>
+            <br />
             <div class="row">
                 <div class="col-md-6">
                     <!-- <h1>Verify Signature</h1> -->
                     <h3>6. Verify signature</h3>
                     <p>
-                        Verify that the signature-nonce pair \((s', R)\) solves
+                        Anyone can now verify that the signature-nonce pair \((s', R)\) solves
                         the schnorr verification equation \(s' * G = R' +
-                        c*X'\). <br />(see proof below)
+                        c*X'\) for some message \(m\) (see proof below).
+                        <br>
+                        Most importantly, <b>the server has no way of correlating</b> this signature-nonce pair with the challenge and nonce they signed with earlier.</b>
                     </p>
                     <form id="verify" onsubmit="return hit_verify()">
                         <div>
@@ -295,7 +299,9 @@
                         </div>
                     </form>
                     <p><b>Valid?</b>: <span id="verify_success"></span></p>
-                    <h3>Excercise</h3>
+                    </div>
+                    <div class="col-md-6">
+                    <h3>Schnorr Verification Equation</h3>
                     <p>
                     Prove \((s', R')\) solves the schnorr verification equation
                     \((s' * G = R' + c*X')\) for challenge \(c\) under public
