@@ -267,7 +267,8 @@ pub async fn verify(
                     s: sig_read.unwrap(),
                     R: Point::<Normal, Public, NonZero>::from_str(&blinded_nonce)
                         .expect("valid nonce")
-                        .to_xonly(),
+                        .into_point_with_even_y()
+                        .0,
                 };
                 schnorr.verify(
                     &verification_pubkey,

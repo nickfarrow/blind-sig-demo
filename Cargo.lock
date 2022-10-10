@@ -231,17 +231,8 @@ dependencies = [
  "rocket_db_pools",
  "schnorr_fun",
  "serde",
- "sha2 0.9.9",
+ "sha2",
  "uuid",
-]
-
-[[package]]
-name = "block-buffer"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4152116fd6e9dadb291ae18fc1ec3575ed6d84c29642d97890f4b4a3417297e4"
-dependencies = [
- "generic-array",
 ]
 
 [[package]]
@@ -313,7 +304,7 @@ dependencies = [
  "hmac",
  "percent-encoding",
  "rand 0.8.5",
- "sha2 0.10.2",
+ "sha2",
  "subtle",
  "time",
  "version_check",
@@ -425,20 +416,11 @@ dependencies = [
 
 [[package]]
 name = "digest"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3dd60d1080a57a05ab032377049e0591415d2b31afd7028356dbf3cc6dcb066"
-dependencies = [
- "generic-array",
-]
-
-[[package]]
-name = "digest"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2fb860ca6fafa5552fb6d0e816a69c8e49f0908bf524e30a90d97c85892d506"
 dependencies = [
- "block-buffer 0.10.2",
+ "block-buffer",
  "crypto-common",
  "subtle",
 ]
@@ -794,7 +776,7 @@ version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c49c37c09c17a53d937dfbb742eb3a961d65a994e6bcdcf37e7399d0cc8ab5e"
 dependencies = [
- "digest 0.10.3",
+ "digest",
 ]
 
 [[package]]
@@ -1690,7 +1672,7 @@ checksum = "f3f6f92acf49d1b98f7a81226834412ada05458b7364277387724a237f062695"
 [[package]]
 name = "schnorr_fun"
 version = "0.7.1"
-source = "git+https://github.com/nickfarrow/secp256kfun?rev=35461a6b4c280bd89aaa894ea3a26f1f734e0cbf#35461a6b4c280bd89aaa894ea3a26f1f734e0cbf"
+source = "git+https://github.com/nickfarrow/secp256kfun?rev=2028bd30b5ccddb0c2189ed976038cb5c3ebd577#2028bd30b5ccddb0c2189ed976038cb5c3ebd577"
 dependencies = [
  "rand 0.8.5",
  "secp256kfun",
@@ -1751,23 +1733,11 @@ dependencies = [
 [[package]]
 name = "secp256kfun"
 version = "0.7.1"
-source = "git+https://github.com/nickfarrow/secp256kfun?rev=35461a6b4c280bd89aaa894ea3a26f1f734e0cbf#35461a6b4c280bd89aaa894ea3a26f1f734e0cbf"
+source = "git+https://github.com/nickfarrow/secp256kfun?rev=2028bd30b5ccddb0c2189ed976038cb5c3ebd577#2028bd30b5ccddb0c2189ed976038cb5c3ebd577"
 dependencies = [
- "digest 0.9.0",
+ "digest",
  "rand_core 0.6.3",
- "secp256kfun_k256_backend",
  "serde",
- "subtle-ng",
-]
-
-[[package]]
-name = "secp256kfun_k256_backend"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99c96aa7609ff3b24fcad38cf4c39712f063e06c23a1af043a3e1111aac75cbc"
-dependencies = [
- "cfg-if",
- "generic-array",
  "subtle-ng",
 ]
 
@@ -1804,26 +1774,13 @@ dependencies = [
 
 [[package]]
 name = "sha2"
-version = "0.9.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d58a1e1bf39749807d89cf2d98ac2dfa0ff1cb3faa38fbb64dd88ac8013d800"
-dependencies = [
- "block-buffer 0.9.0",
- "cfg-if",
- "cpufeatures",
- "digest 0.9.0",
- "opaque-debug",
-]
-
-[[package]]
-name = "sha2"
 version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55deaec60f81eefe3cce0dc50bda92d6d8e88f2a27df7c5033b42afeb1ed2676"
 dependencies = [
  "cfg-if",
  "cpufeatures",
- "digest 0.10.3",
+ "digest",
 ]
 
 [[package]]

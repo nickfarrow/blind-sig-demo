@@ -8,10 +8,9 @@ bdk = "0.20.0"
 miniscript = "7.0.0"
 json = "0.12.4"
 serde = "1.0.140"
-schnorr_fun = { git = "https://github.com/nickfarrow/secp256kfun", rev = "35461a6b4c280bd89aaa894ea3a26f1f734e0cbf"}
-# schnorr_fun = { path = "/home/nick/repos/secp256kfun/schnorr_fun" }
-sha2 = "0.9"
-rand = { version = "0.8" }
+schnorr_fun = { git = "https://github.com/nickfarrow/secp256kfun", rev = "2028bd30b5ccddb0c2189ed976038cb5c3ebd577"}
+sha2 = "0.10"
+rand = "0.8.5"
 
 
 [dependencies.uuid]

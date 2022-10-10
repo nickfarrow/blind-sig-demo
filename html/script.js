@@ -11,36 +11,15 @@ function hide_applied_blindings() {
 }
 hide_applied_blindings();
 
-async function hit_gennonce() {
-    while (true) {
-        reset_blind();
-        // console.log(globalThis.paused);
-        if (globalThis.paused) {
-            break;
-        }
-        fetch("/api/gennonce")
-            .then((response) => response.json())
-            .then(function (data) {
-                document.getElementById("nonce").innerHTML = data.nonce;
-                document.getElementById("usednonce_signform").value =
-                    data.nonce;
-            });
-        await timer(1000);
-    }
-
-    return false;
-}
-
-function toggle_pause_nonce() {
-    if (globalThis.paused) {
-        globalThis.paused = false;
-        document.getElementById("usenonce_button").value = "Use nonce";
-        hit_gennonce();
-    } else {
-        document.getElementById("usenonce_button").value =
-            "Generate Nonces";
-        globalThis.paused = true;
-    }
+function gen_nonce() {
+    fetch("/api/gennonce")
+        .then((response) => response.json())
+        .then(function (data) {
+            console.log(data);
+            document.getElementById("nonce").innerHTML = data.nonce;
+            document.getElementById("usednonce_signform").value =
+                data.nonce;
+        });
     return false;
 }
 
