@@ -76,20 +76,11 @@
             src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
         ></script>
 
-
-        <meta name="viewport" content="width=device-width, initial-scale=1"><script defer src="index.js"></script></head>
-
         <!-- my garbage js is in a script down the bottom -->
     </head>
   <body>
-    <script type="module">
-      import init, { greet } from "./pkg/client.js";
-      init().then(() => {
-        greet("WebAssembly");
-      });
-    </script>
-
-        <div class="container-fluid">
+    <script src="script.js"></script>
+            <div class="container-fluid">
             <h1>Blind Schnorr Signature Interactive Demo</h1>
             <b>What are blind signatures?</b>
             <br />
@@ -423,5 +414,55 @@
                 </div>
             </div>
         </div>
+
+        <script type="module">
+            import init, { greet, BlinderInterface, gen_nonce } from "./pkg/client.js";
+            init().then(() => {
+              greet("WebAssembly");
+              gen_nonce();
+      
+
+              const API_URL = "http://127.0.0.1:1234";
+              async function fetch_nonce() {
+                  return fetch(API_URL + "/nonce")
+                      .then((response) => response.json())
+                      .then((data) => {
+                          console.log(data);
+                          document.getElementById("nonce").innerHTML = data.public_nonce;
+                          document.getElementById("usednonce_signform").value =
+                          data.public_nonce;
+                          document.getElementById("server_pubkey").innerHTML = data.server_pubkey;
+                          return data;
+                      }).await
+                //   return false;
+              }
+      
+              let data = fetch_nonce().await;
+              console.log("HERE");
+              console.log(data);
+      
+              async function hit_genblind_button() {
+                  var nonce = document.getElementById("nonce").innerHTML;
+                  var server_pubkey = document.getElementById("server_pubkey").innerHTML;
+                  var message = document.getElementById("message").innerHTML;
+      
+                  console.log(document.getElementById("nonce").innerHTML);
+                  console.log(message);
+                  console.log("sasdasd");
+                //   console.log(nonce_data.server_pubkey);
+      
+                  let blinder_interface = new BlinderInterface(nonce, server_pubkey, message);
+                  console.log(blinder_interface);
+      
+                  
+                  return false;
+              }
+              hit_genblind_button().await;
+      
+      
+            });
+          </script>
+
+
     </body>
 </html>

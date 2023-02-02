@@ -1,33 +1,36 @@
 #[macro_use]
 extern crate rocket;
 
+use blind_sig_demo::cors;
 use rand::RngCore;
 use rocket::serde::json::serde_json;
 use rocket::serde::{json::Json, Serialize};
 use rocket::{get, launch, routes, State};
 use schnorr_fun::blind::{BlindSigner, SignatureRequest};
+use schnorr_fun::nonce::GlobalRng;
 use schnorr_fun::nonce::Synthetic;
 use std::sync::Mutex;
 
 use rand::rngs::ThreadRng;
 use schnorr_fun::fun::Point;
 use schnorr_fun::{
-    fun::{marker::*, nonce, Scalar},
+    fun::{marker::*, Scalar},
     Schnorr,
 };
 use sha2::Sha256;
 
 pub struct BlindSignerState {
-    state: Mutex<BlindSigner<Sha256, Synthetic<Sha256, nonce::GlobalRng<ThreadRng>>>>,
+    state: Mutex<BlindSigner<Sha256, Synthetic<Sha256, GlobalRng<ThreadRng>>>>,
 }
 
 #[derive(Serialize)]
 pub struct NonceResponse {
     public_nonce: Point<EvenY>,
+    server_pubkey: Point<EvenY>,
 }
 
-#[get("/gennonce")]
-pub fn gennonce(signer_state: &State<BlindSignerState>) -> Json<NonceResponse> {
+#[get("/nonce")]
+pub fn nonce(signer_state: &State<BlindSignerState>) -> Json<NonceResponse> {
     let mut blind_signer = signer_state.inner().state.lock().unwrap();
 
     // Random session id
@@ -36,9 +39,9 @@ pub fn gennonce(signer_state: &State<BlindSignerState>) -> Json<NonceResponse> {
     rng.fill_bytes(&mut bytes);
 
     let public_nonce = blind_signer.gen_nonce(&bytes);
-
     Json(NonceResponse {
-        public_nonce: public_nonce,
+        public_nonce,
+        server_pubkey: blind_signer.public_key(),
     })
 }
 
@@ -85,7 +88,7 @@ pub async fn sign(
 
 #[launch]
 fn rocket() -> _ {
-    let nonce_gen = nonce::Synthetic::<Sha256, nonce::GlobalRng<ThreadRng>>::default();
+    let nonce_gen = Synthetic::<Sha256, GlobalRng<ThreadRng>>::default();
     let server_schnorr = Schnorr::<Sha256, _>::new(nonce_gen);
     let secret = Scalar::random(&mut rand::thread_rng());
     let n_sessions = 5;
@@ -93,7 +96,8 @@ fn rocket() -> _ {
     let blind_signer = BlindSigner::new(n_sessions, secret, server_schnorr);
 
     rocket::build()
-        .mount("/", routes![gennonce])
+        .mount("/", routes![nonce, sign])
+        .attach(cors::CORS)
         .manage(BlindSignerState {
             state: Mutex::new(blind_signer),
         })

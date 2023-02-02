@@ -74,10 +74,9 @@ impl BlinderInterface {
     }
 }
 
-#[wasm_bindgen(start)]
-fn run() -> Result<(), JsValue> {
-    // Use `web_sys`'s global `window` function to get a handle on the global
-    // window object.
+// #[wasm_bindgen(start)]
+#[wasm_bindgen]
+pub fn gen_nonce() -> Result<(), JsValue> {
     let window = web_sys::window().expect("no global `window` exists");
     let document = window.document().expect("should have a document on window");
     let body = document.body().expect("document should have a body");

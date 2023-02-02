@@ -4,10 +4,11 @@
 //     var server_pubkey = document.getElementById("server_pubkey").innerHTML;
 //     var message = document.getElementById("message").innerHTML;
 
-//     var _interface = wasm.BlinderInterface.new(nonce, server_pubkey, message);
+//     return false;
+
 // }
 
-// const API_URL = "http://127.0.0.1:8000";
+// const API_URL = "http://127.0.0.1:1234";
 
 // function gen_nonce() {
 //     fetch(API_URL + "/nonce")

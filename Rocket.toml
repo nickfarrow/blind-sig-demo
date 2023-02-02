@@ -1,2 +1,5 @@
+[global]
+port = 1234
+
 [default.databases.main]
 url = "./database.db"
