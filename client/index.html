@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8" />
+        <!-- Primary Meta Tags -->
+        <title>Blind Schnorr Signature Interactive Demo</title>
+        <meta name="title" content="Blind Schnorr Signature Interactive Demo" />
+        <meta
+            name="description"
+            content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers to act as a coordinator while remaining blind to user activity. Click through the steps!"
+        />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://blindsigs.utxo.club/" />
+        <meta
+            property="og:title"
+            content="Blind Schnorr Signature Interactive Demo"
+        />
+        <meta
+            property="og:description"
+            content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers to act as a coordinator while remaining blind to user activity. Click through the steps!"
+        />
+        <meta
+            property="og:image"
+            content="https://blindsigs.utxo.club/header.png"
+        />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://blindsigs.utxo.club/" />
+        <meta
+            property="twitter:title"
+            content="Blind Schnorr Signature Interactive Demo"
+        />
+        <meta
+            property="twitter:description"
+            content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers to act as a coordinator while remaining blind to user activity. Click through the steps!"
+        />
+        <meta
+            property="twitter:image"
+            content="https://blindsigs.utxo.club/header.png"
+        />
+
+        <!-- Style! -->
+        <link rel="stylesheet" href="/style.css" />
+
+        <!-- bootstrap and latex -->
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1" /> -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+            crossorigin="anonymous"
+        />
+        <script
+            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"
+        ></script>
+
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script
+            id="MathJax-script"
+            async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+        ></script>
+
+
+        <meta name="viewport" content="width=device-width, initial-scale=1"><script defer src="index.js"></script></head>
+
+        <!-- my garbage js is in a script down the bottom -->
+    </head>
+  <body>
+    <script type="module">
+      import init, { greet } from "./pkg/client.js";
+      init().then(() => {
+        greet("WebAssembly");
+      });
+    </script>
+
+        <div class="container-fluid">
+            <h1>Blind Schnorr Signature Interactive Demo</h1>
+            <b>What are blind signatures?</b>
+            <br />
+            With regular
+            <a
+                href="https://en.wikipedia.org/wiki/Schnorr_signature"
+                target="_blank"
+                >schnorr signatures</a
+            >, a <i>private key</i> and <i>nonce</i> are used to sign a
+            <i>challenge</i> for a <i>message</i>. The signature-nonce pair can
+            then be verified against the signer's <i>public key</i>.
+            <br />
+            <br />
+            Blind signatures allow for a user to disguise a message and then
+            request a server to sign this disguised message. The user can then
+            take this signature and unblind it, resulting in an signature that
+            is valid for the original message that is completely uncorrelated to
+            what the server was asked to sign.
+            <b>Blind signatures are powerful for protecting user privacy</b>,
+            where a server can act as an authority/coordinator while remaining
+            blind to the exact activity occuring.
+            <br />
+            <br />
+            See this
+            <a
+                href="https://suredbits.com/schnorr-applications-blind-signatures/"
+                target="_blank"
+                >fantastic article</a
+            >
+            by Nadav for an intro on blind signatures and some motivations for
+            the mathematics.
+            <br />
+            <br />
+            <h3>Follow the numbers 1-6</h3>
+            Get an idea for how blind schnorr signatures work. Actions taken by
+            the <b>signing server</b> are on the left, and <b>user</b>'s are on
+            the right.
+            <br />
+            <br />
+            <div class="row">
+                <div
+                    class="col-md-6"
+                    style="padding-right: 1%; border-right: 3px double #000000"
+                >
+                    <h2><b>Server</b></h2>
+                    <p>
+                        The server has a private key \(x\) and public key \(X =
+                        x*G\).
+                        <br />
+                        <small>
+                            (\(G\) is the generator point of an elliptic curve -
+                            basically all you need to know is that it is
+                            impossible to find \(x\) from knowing \(X\)).
+                        </small>
+                    </p>
+                    <h3>1. Generate a nonce</h3>
+                    <p>
+                        Server generates a random secret \(k\) and public nonce
+                        \(R=k*G\), and saves them.
+                    </p>
+                    <form id="gennonce" onsubmit="return gen_nonce()">
+                        <div>
+                            <input
+                                class="button button1"
+                                type="submit"
+                                id="usenonce_button"
+                                value="Generate Nonces"
+                            />
+                            <p><b>Server Public Key \(X\)</b>: <span id="server_pubkey"></span></p>
+                            <p><b>Nonce \(R\)</b>: <span id="nonce"></span></p>
+                        </div>
+                    </form>
+                    <br />
+                    <h3>4. Sign challenge</h3>
+                    <p>
+                        Request the server to produce a signature for the
+                        challenge using the nonce secret \(k\) and private key
+                        \(x\)
+                        <br />
+                        \(s = k + c'*x\).
+                    </p>
+                    <form id="sign" onsubmit="return hit_sign()">
+                        <div>
+                            <ul class="container">
+                                <li>
+                                    <b>Public Nonce \(R\)</b>:
+                                    <input
+                                        id="usednonce_signform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                                <li>
+                                    <b>Challenge \(c'\)</b>:
+                                    <input
+                                        id="challenge_signform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                            </ul>
+                            <input
+                                class="button button1"
+                                type="submit"
+                                value="Sign challenge"
+                            />
+                        </div>
+                    </form>
+                    <p>
+                        <b>Signature \(s\)</b>:
+                        <span id="blinded_signature"></span>
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <h2><b>User</b></h2>
+                    <h3>2. Generate blindings</h3>
+                    <p>
+                        Choose a message \(m\) and generate three random scalar
+                        values \(\alpha, \beta, t\).
+                        <br />
+                        These scalars will used to blind (disguise) what we
+                        request the server to sign.
+                    </p>
+                    <form id="blind" onsubmit="return hit_genblind()">
+                        <div>
+                            <label><b>Message \(m\)</b>:</label>
+                            <input
+                                style="display: inline"
+                                class="form-control w-50"
+                                name="message"
+                                id="message"
+                                placeholder="Enter your message here"
+                                required
+                            />
+                            <input
+                                class="button button1"
+                                type="submit"
+                                value="Generate blinding values"
+                            />
+                        </div>
+                    </form>
+                    <br />
+                    <p>Blinding values:</p>
+                    <ul class="container">
+                        <li>
+                            <b>\(\alpha\)</b>:
+                            <input
+                                id="alpha"
+                                class="form-control w-100"
+                                readonly
+                            />
+                        </li>
+                        <li>
+                            <b>\(\beta\)</b>:
+                            <input
+                                id="beta"
+                                class="form-control w-100"
+                                readonly
+                            />
+                        </li>
+                        <li>
+                            <b>\(t\)</b>:
+                            <input id="t" class="form-control w-100" readonly />
+                        </li>
+                    </ul>
+                    <h3>3. Apply blindings</h3>
+                    <p>Blind the nonce \(R' = R + \alpha*G + \beta*X\).</p>
+                    <p>Blind the public key \(X' = X + t*G\).</p>
+                    <p>
+                        For a message \(m\) create a challenge \(c = H(X', R',
+                        m)\) using a hash function \(H\), then blind it \(c' = c
+                        + \beta\).
+                    </p>
+
+                    <form
+                        id="apply_blindings"
+                        onsubmit="return hit_apply_bindings()"
+                    >
+                        <input
+                            class="button button1"
+                            type="submit"
+                            value="Apply blindings"
+                        />
+                    </form>
+                    <br />
+                    <div id="blinded_values">
+                        <p>
+                            <b>Blinded nonce \(R'\)</b>:
+                            <span id="blinded_nonce"></span>
+                        </p>
+                        <p>
+                            <b>Blinded pubkey \(X'\)</b>:
+                            <span id="blinded_publickey"></span>
+                        </p>
+                        <p>
+                            <b>Challenge \(c'\)</b>:
+                            <span id="challenge"></span>
+                        </p>
+                    </div>
+
+                    <h3>5. Unblind signature</h3>
+                    <p>
+                        Use the blinding values to get the tweaked signature
+                        \(s' = s + \alpha + c*t\).
+                    </p>
+                    <form id="unblind" onsubmit="return hit_unblind()">
+                        <div>
+                            <input
+                                class="button button1"
+                                type="submit"
+                                value="Unblind signature"
+                            />
+                        </div>
+                    </form>
+                    <br />
+                    <p>
+                        <b>Signature \(s'\)</b>:
+                        <span id="unblinded_signature"></span>
+                    </p>
+                </div>
+            </div>
+            <br />
+            <hr />
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- <h1>Verify Signature</h1> -->
+                    <h3>6. Verify signature</h3>
+                    <p>
+                        Once the user shares this signature-nonce pair \((s',
+                        R)\), anyone can verify it solves the schnorr
+                        verification equation \(s' * G = R' + c*X'\) for some
+                        challenge \(c\) belonging to message \(m\).
+                        <br />
+                        <br />
+                        Most importantly,
+                        <b>the server has no way of correlating</b> this
+                        signature-nonce pair with the challenge and nonce they
+                        signed with earlier.
+                    </p>
+                    <form id="verify" onsubmit="return hit_verify()">
+                        <div>
+                            <ul class="container">
+                                <li>
+                                    <b>Blinded Publickey</b>:
+                                    <input
+                                        id="blinded_pubkey_verifyform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                                <li>
+                                    <b>Message</b>:
+                                    <input
+                                        id="message_verifyform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                                <li>
+                                    <b>Signature</b>:
+                                    <input
+                                        id="signature_verifyform"
+                                        class="form-control w-100"
+                                        placeholder="Paste signature here"
+                                    />
+                                </li>
+                                <li>
+                                    <b>Blinded nonce</b>:
+                                    <input
+                                        id="blinded_nonce_verifyform"
+                                        class="form-control w-100"
+                                        readonly
+                                    />
+                                </li>
+                            </ul>
+
+                            <input
+                                class="button button1"
+                                type="submit"
+                                value="Verify Unblinded Signature"
+                            />
+                        </div>
+                    </form>
+                    <p><b>Valid?</b>: <span id="verify_success"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <h3>Schnorr Verification Equation</h3>
+                    <p>
+                        Prove \((s', R')\) solves the schnorr verification
+                        equation \((s' * G = R' + c*X')\) for challenge \(c\)
+                        under public key \(X'\).
+                    </p>
+                    <small
+                        >Hint: Expand \(s'\) from definitions (plug and chug
+                        algebra)</small
+                    >
+                    <br />
+                    <br />
+                    <button
+                        type="button button1"
+                        data-toggle="collapse"
+                        data-target="#proof"
+                        aria-expanded="false"
+                        aria-controls="proof"
+                    >
+                        Reveal proof
+                    </button>
+                    <div class="collapse" id="proof">
+                        <!-- prettier-ignore -->
+                        <div class="card card-body">Starting with the blinded signature:
+                            $$\begin{aligned} s' &= s + \alpha + c * t
+                            \\ &= (k + c'*x) + \alpha + c * t
+                            \\ &= k + (c+\beta)*x + \alpha + c * t
+                            \\ &= (k + \alpha + \beta*x) + c*(x + t)
+                            \end{aligned}$$
+                            
+                            so
+                            $$\begin{aligned} s'*G &= ((k + \alpha + \beta*x) + c*(x + t))*G
+                            \\ &= (k + \alpha + \beta*x)*G + c*(x + t)*G
+                            \\ &= k*G + \alpha*G + \beta*(x*G) + c*((x*G) + (t*G))
+                            \\ &= (R + \alpha*G + \beta*X) + c*(X + t*G)
+                            \\ &= R' + c*X'
+                            \end{aligned}$$
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <br />
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
