@@ -60,9 +60,9 @@ function request_verify() {
         .then((response) => response.json())
         .then(function (data) {
             if (data.valid) {
-                document.getElementById("verify_success").innerHTML = "Valid signature :)";
+                document.getElementById("verify_success").innerHTML = "Valid signature 😍🛰";
             } else {
-                document.getElementById("verify_success").innerHTML = "INVALID SIGNATURE >:(";
+                document.getElementById("verify_success").innerHTML = "INVALID SIGNATURE 😠";
             }
         });
     return false;

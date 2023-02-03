@@ -98,7 +98,7 @@ pub fn verify(
     public_nonce: String,
     signer_state: &State<BlindSignerState>,
 ) -> Json<VerifyResponse> {
-    let signature_scalar = match Scalar::from_str(&signature) {
+    let signature_scalar = match Scalar::from_str(&signature.trim()) {
         Ok(sig) => sig,
         Err(_) => return Json(VerifyResponse { valid: false }),
     };

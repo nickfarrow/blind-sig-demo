@@ -240,11 +240,11 @@
                         <small>These blinding values are generated locally in your browser using WASM!</small>
                         <br>
                         <p><b>Blinding values:</b></p>
-                        <b>\(\alpha\)</b>:
+                        <b>Alpha \(\alpha\)</b>:
                         <p
                             id="alpha"
                         ></p>
-                        <b>\(\beta\)</b>:
+                        <b>Beta \(\beta\)</b>:
                         <p
                             id="beta"
                         ></p>
@@ -285,7 +285,7 @@
                         <h3>6. Unblind signature</h3>
                         <p>
                             Use the blinding values to get the tweaked signature
-                            \(s' = s + \alpha + c*t\).
+                            \(s' = s + \alpha\).
                         </p>
                         <div id="unblind-signature-wasm-button"></div>
                         <small>🦀 Locally unblind the signature!</small>
@@ -364,48 +364,94 @@
                         <p><b>Valid?</b>: <span id="verify_success"></span></p>
                     </div>
                     <div class="col-md-6">
-                        <h3>Schnorr Verification Equation</h3>
-                        <p>
-                            Prove \((s', R')\) solves the schnorr verification
-                            equation \((s' * G = R' + c*X')\) for challenge \(c\)
-                            under public key \(X'\).
-                        </p>
-                        <small
-                            >Hint: Expand \(s'\) from definitions (plug and chug
-                            algebra)</small
-                        >
-                        <br />
-                        <br />
-                        <button
-                            type="button button1"
-                            data-toggle="collapse"
-                            data-target="#proof"
-                            aria-expanded="false"
-                            aria-controls="proof"
-                        >
-                            Reveal proof
-                        </button>
-                        <div class="collapse" id="proof">
-                            <!-- prettier-ignore -->
-                            <div class="card card-body">Starting with the blinded signature:
-                                $$\begin{aligned} s' &= s + \alpha + c * t
-                                \\ &= (k + c'*x) + \alpha + c * t
-                                \\ &= k + (c+\beta)*x + \alpha + c * t
-                                \\ &= (k + \alpha + \beta*x) + c*(x + t)
-                                \end{aligned}$$
-                                
-                                so
-                                $$\begin{aligned} s'*G &= ((k + \alpha + \beta*x) + c*(x + t))*G
-                                \\ &= (k + \alpha + \beta*x)*G + c*(x + t)*G
-                                \\ &= k*G + \alpha*G + \beta*(x*G) + c*((x*G) + (t*G))
-                                \\ &= (R + \alpha*G + \beta*X) + c*(X + t*G)
-                                \\ &= R' + c*X'
-                                \end{aligned}$$
+                        <div>
+                            <h3>Schnorr Verification Equation</h3>
+                            <p>
+                                Exercise: show \((s', R')\) solves the schnorr verification
+                                equation \((s' * G = R' + c*X)\) for challenge \(c\)
+                                under public key \(X\):
+                            </p>
+                            <small
+                                >Hint: Expand \(s'\) from definitions (plug and chug
+                                algebra)</small
+                            >
+                            <br />
+                            <br />
+                            <button
+                                type="button button1"
+                                data-toggle="collapse"
+                                data-target="#proof"
+                                aria-expanded="false"
+                                aria-controls="proof"
+                            >
+                                Reveal proof
+                            </button>
+                            <div class="collapse" id="proof">
+                                <!-- prettier-ignore -->
+                                <div class="card card-body">Starting with the blinded signature:
+                                    $$\begin{aligned} s' &= s + \alpha
+                                    \\ &= (k + c'*x) + \alpha
+                                    \\ &= k + (c+\beta)*x + \alpha
+                                    \\ &= (k + \alpha + \beta*x) + c*x
+                                    \end{aligned}$$
+                                    
+                                    so
+                                    $$\begin{aligned} s'*G &= ((k + \alpha + \beta*x) + c*x)*G
+                                    \\ &= (k + \alpha + \beta*x)*G + c*(x*G)
+                                    \\ &= k*G + \alpha*G + \beta*(x*G) + c*(x*G)
+                                    \\ &= (R + \alpha*G + \beta*X) + c*X
+                                    \\ &= R' + c*X
+                                    \end{aligned}$$
+                                </div>
                             </div>
+                            <br />
+                            <br />
+                            <br />
                         </div>
-                        <br />
-                        <br />
-                        <br />
+                        <div style="display: none;">
+                            <h3>Schnorr Verification Equation With Tweaked Public Key</h3>
+                            <p>
+                                Prove \((s', R')\) solves the schnorr verification
+                                equation \((s' * G = R' + c*X')\) for challenge \(c\)
+                                under public key \(X'\).
+                            </p>
+                            <small
+                                >Hint: Expand \(s'\) from definitions (plug and chug
+                                algebra)</small
+                            >
+                            <br />
+                            <br />
+                            <button
+                                type="button button1"
+                                data-toggle="collapse"
+                                data-target="#proof"
+                                aria-expanded="false"
+                                aria-controls="proof"
+                            >
+                                Reveal proof
+                            </button>
+                            <div class="collapse" id="proof">
+                                <!-- prettier-ignore -->
+                                <div class="card card-body">Starting with the blinded signature:
+                                    $$\begin{aligned} s' &= s + \alpha + c * t
+                                    \\ &= (k + c'*x) + \alpha + c * t
+                                    \\ &= k + (c+\beta)*x + \alpha + c * t
+                                    \\ &= (k + \alpha + \beta*x) + c*(x + t)
+                                    \end{aligned}$$
+                                    
+                                    so
+                                    $$\begin{aligned} s'*G &= ((k + \alpha + \beta*x) + c*(x + t))*G
+                                    \\ &= (k + \alpha + \beta*x)*G + c*(x + t)*G
+                                    \\ &= k*G + \alpha*G + \beta*(x*G) + c*((x*G) + (t*G))
+                                    \\ &= (R + \alpha*G + \beta*X) + c*(X + t*G)
+                                    \\ &= R' + c*X'
+                                    \end{aligned}$$
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <br />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -415,7 +461,6 @@
             import init, { greet, gen_nonce } from "./pkg/client.js";
             init().then(() => {
               greet();
-              gen_nonce();      
             });
           </script>
 
