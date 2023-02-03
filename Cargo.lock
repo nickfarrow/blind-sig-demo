@@ -1439,7 +1439,7 @@ checksum = "f3f6f92acf49d1b98f7a81226834412ada05458b7364277387724a237f062695"
 [[package]]
 name = "schnorr_fun"
 version = "0.8.2"
-source = "git+https://github.com/nickfarrow/secp256kfun?rev=d0461dac86280e3da1a703ac163b47d1d895af3c#d0461dac86280e3da1a703ac163b47d1d895af3c"
+source = "git+https://github.com/nickfarrow/secp256kfun?rev=e23f800d44a91f1698a3dfb29fb32a8049c1a063#e23f800d44a91f1698a3dfb29fb32a8049c1a063"
 dependencies = [
  "rand 0.8.5",
  "secp256kfun",
@@ -1509,7 +1509,7 @@ dependencies = [
 [[package]]
 name = "secp256kfun"
 version = "0.8.2"
-source = "git+https://github.com/nickfarrow/secp256kfun?rev=d0461dac86280e3da1a703ac163b47d1d895af3c#d0461dac86280e3da1a703ac163b47d1d895af3c"
+source = "git+https://github.com/nickfarrow/secp256kfun?rev=e23f800d44a91f1698a3dfb29fb32a8049c1a063#e23f800d44a91f1698a3dfb29fb32a8049c1a063"
 dependencies = [
  "digest",
  "rand_core 0.6.3",

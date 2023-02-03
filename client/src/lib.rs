@@ -3,7 +3,11 @@ mod utils;
 use std::str::FromStr;
 
 use rand::rngs::ThreadRng;
-use schnorr_fun::{blind::Blinder, fun::Point, nonce, Message, Schnorr};
+use schnorr_fun::{
+    blind::{self, Blinder},
+    fun::{Point, Scalar},
+    nonce, Message, Schnorr,
+};
 use sha2::Sha256;
 use wasm_bindgen::prelude::*;
 
@@ -25,8 +29,6 @@ extern "C" {
 pub fn greet() {
     alert("WASM probably loaded if you're seeing this");
 }
-
-// DON'T TRY TO RUN RUST IN JS, REPLACE JS WITH RUST
 
 // #[wasm_bindgen]
 // pub struct BlinderInterface {
@@ -98,18 +100,18 @@ pub fn gen_nonce() -> Result<(), JsValue> {
 pub fn main_js() -> Result<(), JsValue> {
     let window = web_sys::window().expect("global window does not exists");
     let document = window.document().expect("expecting a document on window");
-    let body = document
-        .body()
-        .expect("document expect to have have a body");
+    // let body = document
+    //     .body()
+    //     .expect("document expect to have have a body");
 
-    let blinding_button = document
+    let gen_blindings_button = document
         .create_element("button")
         .unwrap()
         .dyn_into::<web_sys::HtmlButtonElement>()
         .map_err(|_| ())
         .unwrap();
-    blinding_button.set_inner_html("Click to generate blinding values");
-    let on_down = EventListener::new(&blinding_button, "mousedown", move |_event| {
+    gen_blindings_button.set_inner_html("Generate blinding values");
+    let on_down = EventListener::new(&gen_blindings_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Generate blinding values".into());
         // Read nonces from doc
         let nonce_input = document.get_element_by_id("nonce").unwrap().inner_html();
@@ -163,30 +165,70 @@ pub fn main_js() -> Result<(), JsValue> {
             .unwrap()
             .set_inner_html(&blinder.challenge.to_string());
 
+        // Unhide the next div
+        document
+            .get_element_by_id("apply-blindings-div")
+            .unwrap()
+            .set_attribute("style", "") // Hacky -- idk how to properly set style.visibility
+            .unwrap();
+
         web_sys::console::log_1(&format!("Blinder {:?}", blinder.blinding_tweaks).into());
     });
     on_down.forget();
-    body.append_child(&blinding_button).unwrap();
 
-    // let blind_sign_button = document
-    //     .create_element("button")
-    //     .unwrap()
-    //     .dyn_into::<web_sys::HtmlButtonElement>()
-    //     .map_err(|_| ())
-    //     .unwrap();
-    // blinding_button.set_inner_html("Click to generate blinding values");
-    // let on_down = EventListener::new(&blinding_button, "mousedown", move |_event| {
-    //     web_sys::console::log_1(&"Generate blinding values".into());
-    //     // Read nonces from doc
-    //     let nonce_input = document.get_element_by_id("nonce").unwrap().inner_html();
-    //     let server_pubkey_input = document
-    //         .get_element_by_id("server_pubkey")
-    //         .unwrap()
-    //         .inner_html();
-    //     let message_input = document.get_element_by_id("message").unwrap();
-    // });
-    // on_down.forget();
-    // body.append_child(&blinding_button).unwrap();
+    // Write generate tweaks button into HTML
+    let document = window.document().expect("expecting a document on window");
+    document
+        .get_element_by_id("create-blindings-wasm-button")
+        .unwrap()
+        .append_child(&gen_blindings_button)
+        .unwrap();
+
+    // Create a unblind button
+    let document = window.document().expect("expecting a document on window");
+    let unblind_button = document
+        .create_element("button")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlButtonElement>()
+        .map_err(|_| ())
+        .unwrap();
+    unblind_button.set_inner_html("Unblind Signature");
+    let on_down = EventListener::new(&unblind_button, "mousedown", move |_event| {
+        web_sys::console::log_1(&"Unblind Signature".into());
+        // Read nonces from doc
+        let blinded_signature = Scalar::from_str(
+            &document
+                .get_element_by_id("blinded_signature")
+                .unwrap()
+                .inner_html(),
+        )
+        .expect("valid signature string");
+
+        let alpha = Scalar::from_str(&document.get_element_by_id("alpha").unwrap().inner_html())
+            .expect("valid alpha string");
+
+        let signature = blind::unblind_signature(blinded_signature, &alpha);
+        document
+            .get_element_by_id("unblinded_signature")
+            .unwrap()
+            .set_inner_html(&signature.to_string());
+
+        // Unhide the next div
+        document
+            .get_element_by_id("bottom-row-div")
+            .unwrap()
+            .set_attribute("style", "") // Hacky -- idk how to properly set style.visibility
+            .unwrap();
+    });
+    on_down.forget();
+
+    // Write unblind_button into HTML
+    let document = window.document().expect("expecting a document on window");
+    document
+        .get_element_by_id("unblind-signature-wasm-button")
+        .unwrap()
+        .append_child(&unblind_button)
+        .unwrap();
 
     Ok(())
 }

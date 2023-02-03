@@ -26,7 +26,7 @@ console_error_panic_hook = { version = "0.1.6", optional = true }
 wee_alloc = { version = "0.4.5", optional = true }
 
 
-schnorr_fun = { git = "https://github.com/nickfarrow/secp256kfun", rev = "e2e47e576a6770a9a38f31c7ee1b5a5d9fbe6fe8", features = ["serde"]}
+schnorr_fun = { git = "https://github.com/nickfarrow/secp256kfun", rev = "e23f800d44a91f1698a3dfb29fb32a8049c1a063", features = ["serde"]}
 getrandom = { version = "0.2", features = ["js"] }
 sha2 = "0.10"
 rand = { version = "0.8" }

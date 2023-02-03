@@ -8,6 +8,7 @@ use rocket::{get, launch, routes, State};
 use schnorr_fun::blind::{BlindSigner, SignatureRequest};
 use schnorr_fun::nonce::GlobalRng;
 use schnorr_fun::nonce::Synthetic;
+use schnorr_fun::{Message, Signature};
 use std::str::FromStr;
 use std::sync::Mutex;
 
@@ -56,12 +57,12 @@ pub async fn sign(
     public_nonce: String,
     challenge: String,
 ) -> Json<SignatureResponse> {
-    let mut blind_signer = signer_state.inner().state.lock().unwrap();
-
     let signature_request = SignatureRequest {
         public_nonce: Point::from_str(&public_nonce).unwrap(),
         blind_challenge: Scalar::from_str(&challenge).unwrap(),
     };
+
+    let mut blind_signer = signer_state.inner().state.lock().unwrap();
     // Try sign the request
     let _signature_response = blind_signer.sign(signature_request.clone(), &mut rand::thread_rng());
     let signature = loop {
@@ -85,6 +86,40 @@ pub async fn sign(
     Json(SignatureResponse { signature })
 }
 
+#[derive(Serialize)]
+pub struct VerifyResponse {
+    valid: bool,
+}
+
+#[get("/verify?<message>&<signature>&<public_nonce>")]
+pub fn verify(
+    message: String,
+    signature: String,
+    public_nonce: String,
+    signer_state: &State<BlindSignerState>,
+) -> Json<VerifyResponse> {
+    let signature_scalar = match Scalar::from_str(&signature) {
+        Ok(sig) => sig,
+        Err(_) => return Json(VerifyResponse { valid: false }),
+    };
+    let blinded_pubnonce: Point<Normal> =
+        Point::from_str(&public_nonce).expect("valid formed public nonce");
+
+    let signature: Signature<Public> = Signature {
+        s: signature_scalar,
+        R: blinded_pubnonce.into_point_with_even_y().0,
+    };
+
+    let blind_signer = signer_state.inner().state.lock().unwrap();
+    Json(VerifyResponse {
+        valid: blind_signer.schnorr.verify(
+            &blind_signer.public_key(),
+            Message::<Public>::raw(message.as_bytes()),
+            &signature,
+        ),
+    })
+}
+
 #[launch]
 fn rocket() -> _ {
     let nonce_gen = Synthetic::<Sha256, GlobalRng<ThreadRng>>::default();
@@ -95,7 +130,7 @@ fn rocket() -> _ {
     let blind_signer = BlindSigner::new(n_sessions, secret, server_schnorr);
 
     rocket::build()
-        .mount("/", routes![nonce, sign])
+        .mount("/", routes![nonce, sign, verify])
         .attach(cors::CORS)
         .manage(BlindSignerState {
             state: Mutex::new(blind_signer),

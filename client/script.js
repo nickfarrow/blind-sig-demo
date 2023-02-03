@@ -1,6 +1,6 @@
 const API_URL = "http://127.0.0.1:1234";
 
-function gen_nonce() {
+function request_nonce() {
     fetch(API_URL + "/nonce")
         .then((response) => response.json())
         .then(function (data) {
@@ -9,7 +9,26 @@ function gen_nonce() {
             document.getElementById("usednonce_signform").innerHTML =
             data.public_nonce;
             document.getElementById("server_pubkey").innerHTML = data.server_pubkey;
+            document.getElementById("enter-message-div").style.visibility = "visible";
         });
+    return false;
+}
+
+function use_message() {
+    var message = document.getElementById("message_input").value;
+    document.getElementById("message").innerHTML = message;
+    document.getElementById("create-blindings-div").style.visibility = "visible";;
+
+    return false;
+}
+
+function hit_apply_bindings() {
+    document.getElementById("blinded_values").style.display = "inline";
+    document.getElementById("sign-challenge-div").style.visibility = "visible";
+
+    document.getElementById("message_verifyform").value = document.getElementById("message").innerHTML;
+    document.getElementById("pubkey_verifyform").value = document.getElementById("server_pubkey").innerHTML;
+    document.getElementById("blinded_nonce_verifyform").value = document.getElementById("blinded_nonce").innerHTML;
     return false;
 }
 
@@ -24,17 +43,28 @@ function request_sign() {
         .then((response) => response.json())
         .then(function (data) {
             document.getElementById("blinded_signature").innerHTML = data.signature;
+            document.getElementById("unblind-signature-div").style.visibility = "visible";
         });
     return false;
 }
 
-function use_message() {
-    var message = document.getElementById("message_input").value;
-    document.getElementById("message").innerHTML = message;
+function request_verify() {
+    fetch(
+        API_URL + "/verify?" +
+            new URLSearchParams({
+                message: document.getElementById("message_verifyform").value,
+                signature: document.getElementById("signature_verifyform").value,
+                public_nonce: document.getElementById("blinded_nonce_verifyform").value,
+            })
+    )
+        .then((response) => response.json())
+        .then(function (data) {
+            if (data.valid) {
+                document.getElementById("verify_success").innerHTML = "Valid signature :)";
+            } else {
+                document.getElementById("verify_success").innerHTML = "INVALID SIGNATURE >:(";
+            }
+        });
     return false;
 }
 
-function hit_apply_bindings() {
-    document.getElementById("blinded_values").style.display = "inline";
-    return false;
-}
