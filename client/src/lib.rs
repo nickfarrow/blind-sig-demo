@@ -7,7 +7,10 @@ use nostr::UnsignedEvent;
 use rand::rngs::ThreadRng;
 use schnorr_fun::{
     blind::{self, Blinder},
-    fun::{Point, Scalar},
+    fun::{
+        marker::{Normal, Public},
+        Point, Scalar,
+    },
     nonce, Message, Schnorr, Signature,
 };
 use sha2::Sha256;
@@ -15,7 +18,7 @@ use wasm_bindgen::prelude::*;
 
 use gloo::events::EventListener;
 use wasm_bindgen::JsCast;
-use web_sys::{Document, Window};
+use web_sys::Window;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -62,9 +65,11 @@ fn create_gen_blindings_button(window: &Window) {
             )
             .into(),
         );
+
         let nonce = Point::from_str(&nonce_input).expect("valid nonce");
         let pubkey = Point::from_str(&server_pubkey_input).expect("valid pubkey");
-        let message = Message::raw(message_text.as_bytes());
+        let message_bytes = hex::decode(message_text).unwrap();
+        let message = Message::raw(&message_bytes);
 
         let nonce_gen = nonce::Synthetic::<Sha256, nonce::GlobalRng<ThreadRng>>::default();
         let schnorr = Schnorr::<Sha256, _>::new(nonce_gen.clone());
@@ -150,7 +155,7 @@ fn create_to_nostr_message_button(window: &Window) {
         document
             .get_element_by_id("message")
             .unwrap()
-            .set_inner_html(&hex::encode(unsigned_event.hash_bytes.clone()));
+            .set_inner_html(&unsigned_event.id.clone());
 
         // Store unsigned nostr event for later broadcasting
         document
@@ -247,6 +252,8 @@ fn create_broadcast_nostr_button(window: &Window) {
         )
         .unwrap();
 
+        web_sys::console::log_1(&"Read in nostr event".into());
+
         let blinded_nonce = document
             .get_element_by_id("blinded_nonce")
             .unwrap()
@@ -256,17 +263,31 @@ fn create_broadcast_nostr_button(window: &Window) {
             .unwrap()
             .inner_html();
 
-        let nostr_signed = nostr_unsigned.add_signature(Signature {
-            R: Point::from_str(&blinded_nonce).unwrap(),
+        let blinded_pubnonce: Point<Normal> =
+            Point::from_str(&blinded_nonce).expect("valid formed public nonce");
+
+        let signature: Signature<Public> = Signature {
             s: Scalar::from_str(&signature).unwrap(),
-        });
+            R: blinded_pubnonce.into_point_with_even_y().0,
+        };
+        let nostr_signed = nostr_unsigned.add_signature(signature);
+
+        document
+            .get_element_by_id("nostr_event")
+            .unwrap()
+            .set_inner_html(&serde_json::to_string(&nostr_signed).unwrap());
+
+        web_sys::console::log_1(&"Attached signature to event!".into());
+
+        nostr::broadcast_event(&nostr_signed);
+        alert(&format!("Broadcasted {}", nostr_signed.id));
     });
     on_down.forget();
 
     // Write unblind_button into HTML
     let document = window.document().expect("expecting a document on window");
     document
-        .get_element_by_id("unblind-signature-wasm-button")
+        .get_element_by_id("broadcast-nostr-button-wasm")
         .unwrap()
         .append_child(&broadcast_button)
         .unwrap();
@@ -279,6 +300,7 @@ pub fn main_js() -> Result<(), JsValue> {
     create_gen_blindings_button(&window);
     create_to_nostr_message_button(&window);
     create_unblind_button(&window);
+    create_broadcast_nostr_button(&window);
 
     Ok(())
 }

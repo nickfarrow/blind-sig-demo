@@ -11,6 +11,7 @@ serde = "1.0.140"
 schnorr_fun = { git = "https://github.com/nickfarrow/secp256kfun", rev = "e23f800d44a91f1698a3dfb29fb32a8049c1a063", features = ["serde"]}
 sha2 = "0.10"
 rand = "0.8.5"
+hex = "0.4.3"
 
 [dependencies.uuid]
 version = "1.1.2"

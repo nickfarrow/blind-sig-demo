@@ -54,6 +54,9 @@ features = [
   'RequestInit',
   'RequestMode',
   'Response',
+  'WebSocket',
+  'MessageEvent',
+  'ProgressEvent',
 ]
 
 [dev-dependencies]

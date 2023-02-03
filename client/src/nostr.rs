@@ -6,11 +6,11 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Digest;
 use sha2::Sha256;
-// use websocket::ClientBuilder;
+use web_sys::WebSocket;
 
 #[derive(Serialize, Deserialize)]
 pub struct UnsignedEvent {
-    id: String,
+    pub id: String,
     pubkey: Point<EvenY>,
     created_at: u64,
     kind: u64,
@@ -66,7 +66,7 @@ impl UnsignedEvent {
 
 #[derive(Serialize)]
 pub struct SignedEvent {
-    id: String,
+    pub id: String,
     pubkey: Point<EvenY>,
     created_at: u64,
     kind: u64,
@@ -75,37 +75,32 @@ pub struct SignedEvent {
     sig: Signature,
 }
 
-// // Adapted from https://github.com/rot13maxi/moe-bot/
-// fn publish_to_relay(relay: &str, message: &websocket::Message) -> Result<(), String> {
-//     let mut client = ClientBuilder::new(relay)
-//         .map_err(|err| format!("Could not create client: {}", err.to_string()))?
-//         .connect(None)
-//         .map_err(|err| format!("Could not connect to relay {}: {}", relay, err.to_string()))?;
-//     client
-//         .send_message(message)
-//         .map_err(|err| format!("could not send message to relay: {}", err.to_string()))?;
-//     Ok(())
-// }
+// Adapted from https://github.com/rot13maxi/moe-bot/
+fn publish_to_relay(relay: &str, message: &str) -> Result<(), String> {
+    let ws = WebSocket::new(relay).unwrap();
+    ws.send_with_str(message).unwrap_or_else(|_| ());
+    Ok(())
+}
 
-// // Adapted from https://github.com/rot13maxi/moe-bot/
-// fn broadcast_event(event: SignedEvent) {
-//     let event_json = json!(event).to_string();
-//     dbg!("{}", &event_json);
+// Adapted from https://github.com/rot13maxi/moe-bot/
+pub fn broadcast_event(event: &SignedEvent) {
+    let event_json = json!(event).to_string();
+    dbg!("{}", &event_json);
 
-//     let event_msg = json!(["EVENT", event]).to_string();
-//     dbg!("{}", &event_msg);
-//     let message = websocket::Message::text(event_msg);
-//     for relay in vec![
-//         "wss://relay.damus.io",
-//         "wss://nostr.zebedee.cloud",
-//         "wss://relay.nostr.ch",
-//         "wss://nostr-pub.wellorder.net",
-//         "wss://nostr-pub.semisol.dev",
-//         "wss://nostr.oxtr.dev",
-//     ] {
-//         match publish_to_relay(relay, &message) {
-//             Ok(_) => println!("sent message to {}", relay),
-//             Err(e) => eprintln!("{}", e),
-//         };
-//     }
-// }
+    let event_msg = json!(["EVENT", event]).to_string();
+    dbg!("{}", &event_msg);
+
+    for relay in vec![
+        // "wss://relay.damus.io",
+        "wss://nostr.zebedee.cloud",
+        "wss://relay.nostr.ch",
+        "wss://nostr-pub.wellorder.net",
+        "wss://nostr-pub.semisol.dev",
+        "wss://nostr.oxtr.dev",
+    ] {
+        match publish_to_relay(relay, &event_msg) {
+            Ok(_) => println!("sent message to {}", relay),
+            Err(e) => eprintln!("{}", e),
+        };
+    }
+}

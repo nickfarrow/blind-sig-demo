@@ -111,13 +111,14 @@ pub fn verify(
         R: blinded_pubnonce.into_point_with_even_y().0,
     };
 
+    let message_bytes = hex::decode(message).unwrap();
+    let message: Message<Public> = Message::raw(&message_bytes);
+
     let blind_signer = signer_state.inner().state.lock().unwrap();
     Json(VerifyResponse {
-        valid: blind_signer.schnorr.verify(
-            &blind_signer.public_key(),
-            Message::<Public>::raw(message.as_bytes()),
-            &signature,
-        ),
+        valid: blind_signer
+            .schnorr
+            .verify(&blind_signer.public_key(), message, &signature),
     })
 }
 
