@@ -3,6 +3,7 @@ extern crate rocket;
 
 use blind_sig_demo::cors;
 use rand::RngCore;
+use rocket::fs::FileServer;
 use rocket::serde::{json::Json, Serialize};
 use rocket::{get, launch, routes, State};
 use schnorr_fun::blind::{BlindSigner, SignatureRequest};
@@ -133,6 +134,7 @@ fn rocket() -> _ {
 
     rocket::build()
         .mount("/", routes![nonce, sign, verify])
+        .mount("/", FileServer::from("./client"))
         .attach(cors::CORS)
         .manage(BlindSignerState {
             state: Mutex::new(blind_signer),

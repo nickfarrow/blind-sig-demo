@@ -78,13 +78,15 @@ pub struct SignedEvent {
     sig: Signature,
 }
 
-fn publish_to_relay(relay: &str, message: String) -> Result<(), String> {
-    let ws = WebSocket::new(relay).unwrap();
+fn publish_to_relay(relay: String, message: String) -> Result<(), String> {
+    let ws = WebSocket::new(&relay).unwrap();
     let cloned_ws = ws.clone();
 
     let onopen_callback = Closure::<dyn FnMut()>::new(move || {
         match cloned_ws.send_with_str(&message) {
-            Ok(_) => web_sys::console::log_1(&"event successfully sent!".into()),
+            Ok(_) => {
+                web_sys::console::log_1(&format!("event successfully sent to {}!", relay).into())
+            }
             Err(e) => web_sys::console::log_1(&format!("message failed to send {:?}", e).into()),
         };
     });
@@ -102,14 +104,15 @@ pub fn broadcast_event(event: &SignedEvent) {
     dbg!("{}", &event_msg);
 
     for relay in vec![
-        // "wss://relay.damus.io",
-        // "wss://nostr.zebedee.cloud",
-        "wss://nostr.bitcoiner.social", // "wss://relay.nostr.ch",
-                                        // "wss://nostr-pub.wellorder.net",
-                                        // "wss://nostr-pub.semisol.dev",
-                                        // "wss://nostr.oxtr.dev",
+        "wss://relay.damus.io",
+        "wss://nostr.zebedee.cloud",
+        "wss://nostr.bitcoiner.social",
+        "wss://relay.nostr.ch",
+        "wss://nostr-pub.wellorder.net",
+        "wss://nostr-pub.semisol.dev",
+        "wss://nostr.oxtr.dev",
     ] {
-        match publish_to_relay(relay, event_msg.to_string()) {
+        match publish_to_relay(relay.to_string(), event_msg.to_string()) {
             Ok(_) => println!("sent message to {}", relay),
             Err(e) => eprintln!("{}", e),
         };
