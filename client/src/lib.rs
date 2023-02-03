@@ -1,18 +1,21 @@
+mod nostr;
 mod utils;
 
 use std::str::FromStr;
 
+use nostr::UnsignedEvent;
 use rand::rngs::ThreadRng;
 use schnorr_fun::{
     blind::{self, Blinder},
     fun::{Point, Scalar},
-    nonce, Message, Schnorr,
+    nonce, Message, Schnorr, Signature,
 };
 use sha2::Sha256;
 use wasm_bindgen::prelude::*;
 
 use gloo::events::EventListener;
 use wasm_bindgen::JsCast;
+use web_sys::{Document, Window};
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -23,6 +26,8 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[wasm_bindgen]
 extern "C" {
     fn alert(s: &str);
+    #[wasm_bindgen(js_namespace = Date, js_name = now)]
+    fn date_now() -> f64;
 }
 
 #[wasm_bindgen]
@@ -30,11 +35,8 @@ pub fn greet() {
     alert("WASM probably loaded if you're seeing this");
 }
 
-#[wasm_bindgen(start)]
-pub fn main_js() -> Result<(), JsValue> {
-    let window = web_sys::window().expect("global window does not exists");
+fn create_gen_blindings_button(window: &Window) {
     let document = window.document().expect("expecting a document on window");
-
     let gen_blindings_button = document
         .create_element("button")
         .unwrap()
@@ -114,7 +116,68 @@ pub fn main_js() -> Result<(), JsValue> {
         .unwrap()
         .append_child(&gen_blindings_button)
         .unwrap();
+}
 
+fn create_to_nostr_message_button(window: &Window) {
+    // Create a to-nostr button
+    let document = window.document().expect("expecting a document on window");
+    let to_nostr_message_button = document
+        .create_element("button")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlButtonElement>()
+        .map_err(|_| ())
+        .unwrap();
+    to_nostr_message_button.set_inner_html("Make Nostr Event");
+    let on_down = EventListener::new(&to_nostr_message_button, "mousedown", move |_event| {
+        web_sys::console::log_1(&"Transform into Nostr Event".into());
+
+        let existing_message = document.get_element_by_id("message").unwrap().inner_html();
+        let server_pubkey_input = document
+            .get_element_by_id("server_pubkey")
+            .unwrap()
+            .inner_html();
+
+        let pubkey = Point::from_str(&server_pubkey_input).expect("valid pubkey");
+
+        // Cant use std::time (panic)
+        // https://github.com/rust-lang/rust/issues/48564
+        let time_now = date_now() as u64;
+
+        let unsigned_event =
+            nostr::UnsignedEvent::new_unsigned(pubkey, 1, Vec::new(), existing_message, time_now);
+        web_sys::console::log_1(&"Writing message".into());
+
+        document
+            .get_element_by_id("message")
+            .unwrap()
+            .set_inner_html(&hex::encode(unsigned_event.hash_bytes.clone()));
+
+        // Store unsigned nostr event for later broadcasting
+        document
+            .get_element_by_id("nostr_event")
+            .unwrap()
+            .set_inner_html(&serde_json::to_string(&unsigned_event).unwrap());
+
+        // Unhide the nostr broadcast div
+        document
+            .get_element_by_id("broadcast-nostr-div")
+            .unwrap()
+            .set_attribute("style", "") // Hacky -- idk how to properly set style.visibility
+            .unwrap();
+        web_sys::console::log_1(&"Wrote nostr event messages".into());
+    });
+    on_down.forget();
+
+    // Write to_nostr_message_button into HTML
+    let document = window.document().expect("expecting a document on window");
+    document
+        .get_element_by_id("create-nostr-wasm-button")
+        .unwrap()
+        .append_child(&to_nostr_message_button)
+        .unwrap();
+}
+
+fn create_unblind_button(window: &Window) {
     // Create a unblind button
     let document = window.document().expect("expecting a document on window");
     let unblind_button = document
@@ -126,6 +189,7 @@ pub fn main_js() -> Result<(), JsValue> {
     unblind_button.set_inner_html("Unblind Signature");
     let on_down = EventListener::new(&unblind_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Unblind Signature".into());
+
         // Read nonces from doc
         let blinded_signature = Scalar::from_str(
             &document
@@ -160,6 +224,61 @@ pub fn main_js() -> Result<(), JsValue> {
         .unwrap()
         .append_child(&unblind_button)
         .unwrap();
+}
+
+fn create_broadcast_nostr_button(window: &Window) {
+    // Create a unblind button
+    let document = window.document().expect("expecting a document on window");
+    let broadcast_button = document
+        .create_element("button")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlButtonElement>()
+        .map_err(|_| ())
+        .unwrap();
+    broadcast_button.set_inner_html("Broadcast Event (!)");
+    let on_down = EventListener::new(&broadcast_button, "mousedown", move |_event| {
+        web_sys::console::log_1(&"Broadcasting nostr event".into());
+
+        let nostr_unsigned: UnsignedEvent = serde_json::from_str(
+            &document
+                .get_element_by_id("nostr_event")
+                .unwrap()
+                .inner_html(),
+        )
+        .unwrap();
+
+        let blinded_nonce = document
+            .get_element_by_id("blinded_nonce")
+            .unwrap()
+            .inner_html();
+        let signature = document
+            .get_element_by_id("unblinded_signature")
+            .unwrap()
+            .inner_html();
+
+        let nostr_signed = nostr_unsigned.add_signature(Signature {
+            R: Point::from_str(&blinded_nonce).unwrap(),
+            s: Scalar::from_str(&signature).unwrap(),
+        });
+    });
+    on_down.forget();
+
+    // Write unblind_button into HTML
+    let document = window.document().expect("expecting a document on window");
+    document
+        .get_element_by_id("unblind-signature-wasm-button")
+        .unwrap()
+        .append_child(&broadcast_button)
+        .unwrap();
+}
+
+#[wasm_bindgen(start)]
+pub fn main_js() -> Result<(), JsValue> {
+    let window = web_sys::window().expect("global window does not exists");
+
+    create_gen_blindings_button(&window);
+    create_to_nostr_message_button(&window);
+    create_unblind_button(&window);
 
     Ok(())
 }

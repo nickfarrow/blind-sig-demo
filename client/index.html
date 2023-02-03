@@ -116,7 +116,7 @@
             the mathematics.
             <br />
             <br />
-            <h2>Follow the numbers 1-6</h2>
+            <h2>Follow steps 1-6</h2>
             Get an idea for how blind schnorr signatures work. Actions taken by
             the <b>signing server</b> are on the left, and <b>user</b>'s are on
             the right.
@@ -125,7 +125,7 @@
             <div class="row">
                 <div
                     class="col-md-6"
-                    style="padding-right: 1%; border-right: 3px solid #000000"
+                    style="padding-right: 1%; border-right: 3px solid white"
                 >
                     <h2><b>Server</b></h2>
                     <div id="nonce-gen-div">
@@ -164,7 +164,7 @@
                 </div>
                 <div class="col-md-6">
                     <h2><b>User</b></h2>
-                    <div id="enter-message-div" style=" visibility:hidden;">
+                    <div id="enter-message-div" style=" visibility:visible;">
                         <h2>2. Choose a message</h2>
                         <p>
                             Choose a message for the server to blindly sign \(m\),
@@ -182,10 +182,15 @@
                                 <input
                                     class="button button1"
                                     type="submit"
-                                    value="Use"
+                                    onclick="javascript:document.getElementById('make_nostr_message').innerHTML='false'; return true;"
+                                    value="Use raw"
                                 />
+                                <br>
+                                <span id="make_nostr_message" style="display: none;"></span>
                             </div>
                         </form>
+                        <br>
+                        <div id="create-nostr-wasm-button"></div>
                         <br>
                         <p><b>Message \(m\)</b>: <span id="message"></span></p>
                         <br />
@@ -214,7 +219,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6" style="padding-right: 1%; border-right: 3px solid #000000">
+                <div class="col-md-6" style="padding-right: 1%; border-right: 3px solid white">
                     <div id="sign-challenge-div" style=" visibility:hidden;">
                         <h2>5. Sign challenge</h2>
                         <p>
@@ -373,6 +378,11 @@
                         <p><b>Valid?</b>: <span id="verify_success"></span></p>
                     </div>
                     <div class="col-md-6">
+                        <div id="broadcast-nostr-div" style="display: none">
+                            <b>Nostr Event:</b>
+                            <p id="nostr_event">
+                            </p>
+                        </div>
                         <div>
                             <h2>Schnorr Verification Equation</h2>
                             <p>

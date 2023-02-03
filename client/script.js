@@ -10,6 +10,8 @@ function request_nonce() {
             data.public_nonce;
             document.getElementById("server_pubkey").innerHTML = data.server_pubkey;
             document.getElementById("enter-message-div").style.visibility = "visible";
+        }).catch((data) => {
+            document.getElementById("server_pubkey").innerHTML = "AHh the blind signing server is down :(";
         });
     return false;
 }
@@ -18,7 +20,6 @@ function use_message() {
     var message = document.getElementById("message_input").value;
     document.getElementById("message").innerHTML = message;
     document.getElementById("create-blindings-div").style.visibility = "visible";;
-
     return false;
 }
 
