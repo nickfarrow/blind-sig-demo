@@ -85,12 +85,13 @@
       import init, { greet } from "./pkg/client.js";
       async function run() {
         await init();
-        // greet();
+        greet();
       }
 
       run();
     </script>
     <div class="container-fluid">
+      <br />
       <h1>Blind Schnorr Signature Interactive Demo</h1>
       <b>What are blind signatures?</b>
       <br />
@@ -162,9 +163,12 @@
                 <br />
                 <p>
                   <b>Server Public Key \(X\)</b>:
-                  <span id="server_pubkey"></span>
+                  <span class="highlighted_var" id="server_pubkey"></span>
                 </p>
-                <p><b>Nonce \(R\)</b>: <span id="nonce"></span></p>
+                <p>
+                  <b>Nonce \(R\)</b>:
+                  <span class="highlighted_var" id="nonce"></span>
+                </p>
               </div>
             </form>
             <br />
@@ -188,18 +192,37 @@
                 <input
                   class="button button1"
                   type="submit"
-                  onclick="javascript:document.getElementById('make_nostr_message').innerHTML='false'; return true;"
+                  onclick="javascript:document.getElementById('create-nostr-div').style.display = 'inline'; return true;"
                   value="Use raw"
                 />
                 <br />
-                <span id="make_nostr_message" style="display: none"></span>
               </div>
             </form>
             <br />
-            <div id="create-nostr-wasm-button" style="display: none"></div>
+            <div id="create-nostr-div" style="display: none">
+              <p>
+                <span
+                  id="create-nostr-wasm-button"
+                  style="display: none"
+                ></span>
+                (optional)
+                <b>&lt;Unsigned Nostr Event&gt;</b>
+              </p>
+
+              <p id="nostr_event">
+                <br />
+              </p>
+            </div>
             <br />
-            <span id="original_message" style="display: none"></span>
-            <p><b>Message \(m\)</b>: <span id="message"></span></p>
+            <span
+              class="highlighted_var"
+              id="original_message"
+              style="display: none"
+            ></span>
+            <p>
+              <b>Message \(m\)</b>:
+              <span class="highlighted_var" id="message"></span>
+            </p>
             <br />
           </div>
           <div id="create-blindings-div" style="visibility: hidden">
@@ -218,9 +241,9 @@
             <br />
             <p><b>Blinding values:</b></p>
             <b>Alpha \(\alpha\)</b>:
-            <p id="alpha"></p>
+            <p class="highlighted_var" id="alpha"></p>
             <b>Beta \(\beta\)</b>:
-            <p id="beta"></p>
+            <p class="highlighted_var" id="beta"></p>
           </div>
         </div>
       </div>
@@ -244,7 +267,7 @@
                     <b>Public Nonce \(R\)</b>:
                     <p
                       id="usednonce_signform"
-                      class="form-control w-100"
+                      class="form-control w-100 highlighted_var"
                       readonly
                     ></p>
                   </li>
@@ -252,7 +275,7 @@
                     <b>Blinded Challenge \(c'\)</b>:
                     <p
                       id="challenge_signform"
-                      class="form-control w-100"
+                      class="form-control w-100 highlighted_var"
                       readonly
                     ></p>
                   </li>
@@ -266,7 +289,7 @@
             </form>
             <p>
               <b>Signature \(s\)</b>:
-              <span id="blinded_signature"></span>
+              <span class="highlighted_var" id="blinded_signature"></span>
             </p>
           </div>
         </div>
@@ -294,11 +317,11 @@
             <div id="blinded_values" style="display: none">
               <p>
                 <b>Blinded nonce \(R'\)</b>:
-                <span id="blinded_nonce"></span>
+                <span class="highlighted_var" id="blinded_nonce"></span>
               </p>
               <p>
                 <b>Challenge \(c'\)</b>:
-                <span id="blinded_challenge"></span>
+                <span class="highlighted_var" id="blinded_challenge"></span>
               </p>
             </div>
           </div>
@@ -313,7 +336,7 @@
             <br />
             <p>
               <b>Signature \(s'\)</b>:
-              <span id="unblinded_signature"></span>
+              <span class="highlighted_var" id="unblinded_signature"></span>
             </p>
           </div>
         </div>
@@ -384,12 +407,7 @@
           </div>
           <div class="col-md-6">
             <div id="broadcast-nostr-div" style="display: none">
-              <b>Nostr Event:</b>
-              <p id="nostr_event">
-                <br />
-                <b>Signed Nostr Event:</b>
-              </p>
-
+              <b>&lt;Signed Nostr Event&gt;</b>
               <p id="signed_nostr_event"></p>
               <div id="broadcast-nostr-button-wasm"></div>
               <br />

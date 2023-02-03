@@ -127,7 +127,17 @@ pub fn verify(
 fn rocket() -> _ {
     let nonce_gen = Synthetic::<Sha256, GlobalRng<ThreadRng>>::default();
     let server_schnorr = Schnorr::<Sha256, _>::new(nonce_gen);
-    let secret = Scalar::random(&mut rand::thread_rng());
+
+    let secret = match std::fs::read_to_string("secret") {
+        Ok(secret) => Scalar::from_str(&secret).expect("valid secret string"),
+        Err(_) => {
+            eprintln!("Generating random secret...");
+            let secret = Scalar::random(&mut rand::thread_rng());
+            std::fs::write("secret", secret.to_string()).expect("unable to write secret");
+            secret
+        }
+    };
+
     let n_sessions = 1;
 
     let blind_signer = BlindSigner::new(n_sessions, secret, server_schnorr);

@@ -6,9 +6,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Digest;
 use sha2::Sha256;
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::{prelude::Closure, JsCast};
-use web_sys::MessageEvent;
 use web_sys::WebSocket;
 
 #[derive(Serialize, Deserialize)]

@@ -8,6 +8,12 @@ body {
     font-family: "Lucida Console", "Courier New", monospace;
 }
 
+.highlighted_var {
+    color: rgb(210, 95, 13);
+    font-weight: 800;
+    font-size: 1em;
+}
+
 .card {
     background-color: black;
 }

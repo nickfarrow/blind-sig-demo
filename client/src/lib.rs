@@ -35,7 +35,7 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn greet() {
-    alert("WASM probably loaded if you're seeing this");
+    alert("Loaded: secp256kfun Schnorr Blind Signature WASM 🦀");
 }
 
 fn create_gen_blindings_button(window: &Window) {
@@ -132,7 +132,7 @@ fn create_to_nostr_message_button(window: &Window) {
         .dyn_into::<web_sys::HtmlButtonElement>()
         .map_err(|_| ())
         .unwrap();
-    to_nostr_message_button.set_inner_html("Make Nostr Event");
+    to_nostr_message_button.set_inner_html("Blind sign Nostr event");
     let on_down = EventListener::new(&to_nostr_message_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Transform into Nostr Event".into());
 
@@ -244,7 +244,7 @@ fn create_broadcast_nostr_button(window: &Window) {
         .dyn_into::<web_sys::HtmlButtonElement>()
         .map_err(|_| ())
         .unwrap();
-    broadcast_button.set_inner_html("Broadcast Event (!)");
+    broadcast_button.set_inner_html("Add signature & broadcast event!");
     let on_down = EventListener::new(&broadcast_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Broadcasting nostr event".into());
 
@@ -284,7 +284,10 @@ fn create_broadcast_nostr_button(window: &Window) {
         web_sys::console::log_1(&"Attached signature to event!".into());
 
         nostr::broadcast_event(&nostr_signed);
-        alert(&format!("Broadcasted Nostr event: {}", nostr_signed.id));
+        alert(&format!(
+            "Broadcasted Nostr event: nostr.guru/e/{}",
+            nostr_signed.id
+        ));
         web_sys::console::log_1(&"Broadcasted nostr event!".into());
     });
     on_down.forget();
