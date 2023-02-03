@@ -43,6 +43,7 @@ dependencies = [
  "getrandom",
  "gloo",
  "hex",
+ "js-sys",
  "rand",
  "schnorr_fun",
  "serde",

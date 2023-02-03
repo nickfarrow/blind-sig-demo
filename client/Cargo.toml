@@ -33,6 +33,7 @@ rand = { version = "0.8" }
 serde_json = "1"
 serde = "1.0.152"
 hex = "0.4.3"
+js-sys = "0.3"
 
 [dependencies.web-sys]
 version = "0.3.4"

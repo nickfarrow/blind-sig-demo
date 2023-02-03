@@ -190,8 +190,9 @@
                             </div>
                         </form>
                         <br>
-                        <div id="create-nostr-wasm-button"></div>
+                        <div id="create-nostr-wasm-button" style="display: none;"></div>
                         <br>
+                        <span id="original_message" style="display: none;"></span>
                         <p><b>Message \(m\)</b>: <span id="message"></span></p>
                         <br />
                     </div>
@@ -381,10 +382,14 @@
                         <div id="broadcast-nostr-div" style="display: none">
                             <b>Nostr Event:</b>
                             <p id="nostr_event">
+                            <br>
+                            <b>Signed Nostr Event:</b>
+                            <p id="signed_nostr_event">
                             </p>
                             <div id="broadcast-nostr-button-wasm">
                             </div>
                             <br>
+                        </div>
                         <div>
                             <h2>Schnorr Verification Equation</h2>
                             <p>

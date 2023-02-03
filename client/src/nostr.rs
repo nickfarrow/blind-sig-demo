@@ -6,6 +6,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Digest;
 use sha2::Sha256;
+use wasm_bindgen::prelude::*;
+use wasm_bindgen::{prelude::Closure, JsCast};
+use web_sys::MessageEvent;
 use web_sys::WebSocket;
 
 #[derive(Serialize, Deserialize)]
@@ -75,10 +78,18 @@ pub struct SignedEvent {
     sig: Signature,
 }
 
-// Adapted from https://github.com/rot13maxi/moe-bot/
-fn publish_to_relay(relay: &str, message: &str) -> Result<(), String> {
+fn publish_to_relay(relay: &str, message: String) -> Result<(), String> {
     let ws = WebSocket::new(relay).unwrap();
-    ws.send_with_str(message).unwrap_or_else(|_| ());
+    let cloned_ws = ws.clone();
+
+    let onopen_callback = Closure::<dyn FnMut()>::new(move || {
+        match cloned_ws.send_with_str(&message) {
+            Ok(_) => web_sys::console::log_1(&"event successfully sent!".into()),
+            Err(e) => web_sys::console::log_1(&format!("message failed to send {:?}", e).into()),
+        };
+    });
+    ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
+    onopen_callback.forget();
     Ok(())
 }
 
@@ -92,13 +103,13 @@ pub fn broadcast_event(event: &SignedEvent) {
 
     for relay in vec![
         // "wss://relay.damus.io",
-        "wss://nostr.zebedee.cloud",
-        "wss://relay.nostr.ch",
-        "wss://nostr-pub.wellorder.net",
-        "wss://nostr-pub.semisol.dev",
-        "wss://nostr.oxtr.dev",
+        // "wss://nostr.zebedee.cloud",
+        "wss://nostr.bitcoiner.social", // "wss://relay.nostr.ch",
+                                        // "wss://nostr-pub.wellorder.net",
+                                        // "wss://nostr-pub.semisol.dev",
+                                        // "wss://nostr.oxtr.dev",
     ] {
-        match publish_to_relay(relay, &event_msg) {
+        match publish_to_relay(relay, event_msg.to_string()) {
             Ok(_) => println!("sent message to {}", relay),
             Err(e) => eprintln!("{}", e),
         };

@@ -136,7 +136,11 @@ fn create_to_nostr_message_button(window: &Window) {
     let on_down = EventListener::new(&to_nostr_message_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Transform into Nostr Event".into());
 
-        let existing_message = document.get_element_by_id("message").unwrap().inner_html();
+        let existing_message = document
+            .get_element_by_id("original_message")
+            .unwrap()
+            .inner_html();
+
         let server_pubkey_input = document
             .get_element_by_id("server_pubkey")
             .unwrap()
@@ -273,14 +277,15 @@ fn create_broadcast_nostr_button(window: &Window) {
         let nostr_signed = nostr_unsigned.add_signature(signature);
 
         document
-            .get_element_by_id("nostr_event")
+            .get_element_by_id("signed_nostr_event")
             .unwrap()
             .set_inner_html(&serde_json::to_string(&nostr_signed).unwrap());
 
         web_sys::console::log_1(&"Attached signature to event!".into());
 
         nostr::broadcast_event(&nostr_signed);
-        alert(&format!("Broadcasted {}", nostr_signed.id));
+        alert(&format!("Broadcasted Nostr event: {}", nostr_signed.id));
+        web_sys::console::log_1(&"Broadcasted nostr event!".into());
     });
     on_down.forget();
 

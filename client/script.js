@@ -16,10 +16,24 @@ function request_nonce() {
     return false;
 }
 
+function to_hex(our_string) {
+    var result = "";
+    for (i=0; i<our_string.length; i++) {
+        hex = our_string.charCodeAt(i).toString(16);
+        result += ("000"+hex).slice(-4);
+    }
+    return result;
+}
+
 function use_message() {
     var message = document.getElementById("message_input").value;
+    document.getElementById("original_message").innerHTML = message;
+    // message = message.split ('').map (function (c) { return c.charCodeAt (0); });
+    // message = message.map(n => n.toString(16).padStart(2, '0')).join('');
+    message = to_hex(message);
     document.getElementById("message").innerHTML = message;
-    document.getElementById("create-blindings-div").style.visibility = "visible";;
+    document.getElementById("create-blindings-div").style.visibility = "visible";
+    document.getElementById("create-nostr-wasm-button").style.display = "inline";
     return false;
 }
 
