@@ -1,0 +1,130 @@
+html, body {
+    color: rgb(7, 199, 242);
+    background-color: black;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+
+.card {
+    background-color: black;
+}
+
+#clubhead {
+    font-size:0.85em; 
+    padding:8px;
+    border-radius:20px;    
+    background-image: linear-gradient(to bottom right, rgb(72, 78, 88), rgb(17, 103, 179));
+    color:#FF9900; 
+    border-color:#FF9900;
+    border-width: 5px;
+    font-weight: 1000;
+    box-shadow: 5px 5px 5px black;
+}
+
+pre {
+    background-color: gray;
+    border: 12px solid rgb(0, 0, 0);
+    display: block;
+    padding: 20px;
+    padding-top: 0px;
+}
+
+.addresses {
+    padding-top: 15px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color:rgb(255, 0, 136);
+    font-weight: 800;
+    font-size: 1em;
+    /* text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; */
+    background-image: linear-gradient(to bottom right, rgb(64, 67, 75), rgb(22, 112, 108));
+}
+
+.container-margin {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+#box {
+    color: #4acae3;
+    /* original : rgb(45, 65, 78) */
+    background-image: linear-gradient(to bottom, rgb(0, 0, 0), rgb(37, 37, 37));
+    border-radius: 25px;
+    padding: 20px;
+    font-size: 1em;
+}
+
+.navbar-nav {
+    font-weight: 900;
+}
+
+p {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    /* margin: 0; */
+    padding: 5px;
+}
+h1 {
+    /* font-family: Arial, sans-serif; */
+    font-size: 2em;
+    color: #00e472;
+    text-decoration-color: black;
+}
+
+h2 {
+    /* font-family: Arial, sans-serif; */
+    font-size: 1.5em;
+    color: #ff9900;
+    text-decoration-color: black;
+}
+
+.mainlink {
+    font-size: 1.4em;
+    color: #e69721;
+    text-decoration-color: black;
+}
+.mainlink:hover{
+    color: rgb(255, 0, 0);
+}
+
+.postlink {
+    font-size: 1.5em;
+    color: #008cff;
+    text-decoration-color: black;
+}
+.postlink:hover{
+    color: white;
+}
+
+a {
+    text-decoration-color: rgb(4, 245, 185);
+    color:#c2ebee
+}
+
+small {
+    color: rgb(0, 226, 38);
+
+}
+/* h2 {
+    font-family: Arial, sans-serif;
+    font-size: 2.5em;
+    color: rgb(0, 255, 234)
+} */
+
+#polloframe {
+    /* Set the width of the iframe the size you want to transform it FROM */
+    width: 640px;
+    height: 480px;
+    /* apply the transform */
+    -webkit-transform:scale(0.5);
+    -moz-transform:scale(0.5);
+    -o-transform:scale(0.5);
+    transform:scale(0.5);
+    /* position it, as if it was the original size */
+    position: relative;
+    left: -200px;
+    top: -100px;
+}

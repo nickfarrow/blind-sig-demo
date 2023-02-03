@@ -48,7 +48,7 @@ pub fn nonce(signer_state: &State<BlindSignerState>) -> Json<NonceResponse> {
 
 #[derive(Serialize)]
 pub struct SignatureResponse {
-    signature: Scalar<Public, Zero>,
+    signature: Option<Scalar<Public, Zero>>,
 }
 
 #[get("/sign?<public_nonce>&<challenge>")]
@@ -75,10 +75,11 @@ pub async fn sign(
             }
             Some(response) => {
                 // We have received some response
-                match response {
-                    Some(sig) => break sig,
-                    None => panic!(), //TODO gently kill the disconnect
-                };
+                // match response {
+                //     Some(sig) => break sig,
+                //     None => panic!(), //TODO gently kill the disconnect
+                // };
+                break response;
             }
         }
     };

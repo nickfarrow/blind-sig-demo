@@ -42,9 +42,6 @@
             content="https://blindsigs.utxo.club/header.png"
         />
 
-        <!-- Style! -->
-        <link rel="stylesheet" href="/style.css" />
-
         <!-- bootstrap and latex -->
         <!-- <meta name="viewport" content="width=device-width, initial-scale=1" /> -->
         <link
@@ -76,10 +73,13 @@
             src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
         ></script>
 
-        <!-- my garbage js is in a script down the bottom -->
+        <!-- Style! -->
+        <link rel="stylesheet" href="/style.css" />
+
+        <!-- my garbage js -- WASM is loaded at bottom -->
+        <script src="script.js"></script>
     </head>
-  <body>
-    <script src="script.js"></script>
+    <body>
             <div class="container-fluid">
             <h1>Blind Schnorr Signature Interactive Demo</h1>
             <b>What are blind signatures?</b>
@@ -96,9 +96,11 @@
             <br />
             Blind signatures allow for a user to disguise a message and then
             request a server to sign this disguised message. The user can then
-            take this signature and unblind it, resulting in an signature that
+            take this signature and unblind it, resulting in a signature that
             is valid for the original message that is completely uncorrelated to
             what the server was asked to sign.
+            <br>
+            <br>
             <b>Blind signatures are powerful for protecting user privacy</b>,
             where a server can act as an authority/coordinator while remaining
             blind to the exact activity occuring.
@@ -114,7 +116,7 @@
             the mathematics.
             <br />
             <br />
-            <h3>Follow the numbers 1-6</h3>
+            <h2>Follow the numbers 1-6</h2>
             Get an idea for how blind schnorr signatures work. Actions taken by
             the <b>signing server</b> are on the left, and <b>user</b>'s are on
             the right.
@@ -123,7 +125,7 @@
             <div class="row">
                 <div
                     class="col-md-6"
-                    style="padding-right: 1%; border-right: 3px double #000000"
+                    style="padding-right: 1%; border-right: 3px solid #000000"
                 >
                     <h2><b>Server</b></h2>
                     <div id="nonce-gen-div">
@@ -137,7 +139,7 @@
                                 impossible to find the secret \(x\) from knowing \(X\)).
                             </small>
                         </p>
-                        <h3>1. Generate a nonce</h3>
+                        <h2>1. Generate a nonce</h2>
                         <p>
                             Server generates a new random secret \(k\) and uses it to create a public
                             nonce \(R=k*G\), and saves them.
@@ -158,8 +160,63 @@
                         </form>
                         <br />
                     </div>
+                    
+                </div>
+                <div class="col-md-6">
+                    <h2><b>User</b></h2>
+                    <div id="enter-message-div" style=" visibility:hidden;">
+                        <h2>2. Choose a message</h2>
+                        <p>
+                            Choose a message for the server to blindly sign \(m\),
+                        </p>
+                        <form id="blind" onsubmit="return use_message()">
+                            <div>
+                                <label>Enter a message:</label>
+                                <input
+                                    style="display: inline"
+                                    class="form-control w-50"
+                                    name="message"
+                                    id="message_input"
+                                    required
+                                />
+                                <input
+                                    class="button button1"
+                                    type="submit"
+                                    value="Use"
+                                />
+                            </div>
+                        </form>
+                        <br>
+                        <p><b>Message \(m\)</b>: <span id="message"></span></p>
+                        <br />
+                    </div>
+                    <div id="create-blindings-div" style=" visibility:hidden;">
+                        <h2>3. Generate blinding values</h2>
+                        <p>Generate two random scalar
+                            values \(\alpha and \beta).
+                            <br />
+                            These scalars will used to blind (disguise) what we
+                            request the server to sign.
+                        </p>
+                        <div id="create-blindings-wasm-button"></div>
+                        <small>🦀 These blinding values are generated locally in your browser using WASM! 💻</small>
+                        <br>
+                        <p><b>Blinding values:</b></p>
+                        <b>Alpha \(\alpha\)</b>:
+                        <p
+                            id="alpha"
+                        ></p>
+                        <b>Beta \(\beta\)</b>:
+                        <p
+                            id="beta"
+                        ></p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6" style="padding-right: 1%; border-right: 3px solid #000000">
                     <div id="sign-challenge-div" style=" visibility:hidden;">
-                        <h3>5. Sign challenge</h3>
+                        <h2>5. Sign challenge</h2>
                         <p>
                             Request the server to produce a signature for the
                             challenge using the nonce secret \(k\) and private key
@@ -201,56 +258,8 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h2><b>User</b></h2>
-                    <div id="enter-message-div" style=" visibility:hidden;">
-                        <h3>2. Choose a message</h3>
-                        <p>
-                            Choose a message for the server to blindly sign \(m\),
-                        </p>
-                        <form id="blind" onsubmit="return use_message()">
-                            <div>
-                                <label>Enter a message:</label>
-                                <input
-                                    style="display: inline"
-                                    class="form-control w-50"
-                                    name="message"
-                                    id="message_input"
-                                    required
-                                />
-                                <input
-                                    class="button button1"
-                                    type="submit"
-                                    value="Use"
-                                />
-                            </div>
-                        </form>
-                        <br>
-                        <p><b>Message \(m\)</b>: <span id="message"></span></p>
-                        <br />
-                    </div>
-                    <div id="create-blindings-div" style=" visibility:hidden;">
-                        <h3>3. Generate blinding values</h3>
-                        <p>Generate two random scalar
-                            values \(\alpha and \beta).
-                            <br />
-                            These scalars will used to blind (disguise) what we
-                            request the server to sign.
-                        </p>
-                        <div id="create-blindings-wasm-button"></div>
-                        <small>These blinding values are generated locally in your browser using WASM!</small>
-                        <br>
-                        <p><b>Blinding values:</b></p>
-                        <b>Alpha \(\alpha\)</b>:
-                        <p
-                            id="alpha"
-                        ></p>
-                        <b>Beta \(\beta\)</b>:
-                        <p
-                            id="beta"
-                        ></p>
-                    </div>
                     <div id="apply-blindings-div" style="visibility:hidden;">
-                        <h3>4. Apply blindings</h3>
+                        <h2>4. Apply blindings</h2>
                         <p>Blind the nonce \(R' = R + \alpha*G + \beta*X\).</p>
                         <p>
                             For a message \(m\) create a challenge \(c = H(X, R',
@@ -268,7 +277,7 @@
                                 value="Apply blindings"
                             />
                         </form>
-                        <small>🦀 Use WASM to locally blind the nonce and create a challenge.</small>
+                        <small>🦀 Use WASM to locally blind the nonce and create a challenge. 📝</small>
                         <br />
                         <div id="blinded_values" style="display: none;">
                             <p>
@@ -282,7 +291,7 @@
                         </div>
                     </div>
                     <div id="unblind-signature-div" style=" visibility:hidden;">
-                        <h3>6. Unblind signature</h3>
+                        <h2>6. Unblind signature</h2>
                         <p>
                             Use the blinding values to get the tweaked signature
                             \(s' = s + \alpha\).
@@ -304,7 +313,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <!-- <h1>Verify Signature</h1> -->
-                        <h3>7. Verify signature</h3>
+                        <h2>7. Verify signature</h2>
                         <p>
                             Once the user shares this signature-nonce pair \((s',
                             R)\), anyone can verify it solves the schnorr
@@ -365,7 +374,7 @@
                     </div>
                     <div class="col-md-6">
                         <div>
-                            <h3>Schnorr Verification Equation</h3>
+                            <h2>Schnorr Verification Equation</h2>
                             <p>
                                 Exercise: show \((s', R')\) solves the schnorr verification
                                 equation \((s' * G = R' + c*X)\) for challenge \(c\)
@@ -409,7 +418,7 @@
                             <br />
                         </div>
                         <div style="display: none;">
-                            <h3>Schnorr Verification Equation With Tweaked Public Key</h3>
+                            <h2>Schnorr Verification Equation With Tweaked Public Key</h2>
                             <p>
                                 Prove \((s', R')\) solves the schnorr verification
                                 equation \((s' * G = R' + c*X')\) for challenge \(c\)
@@ -457,10 +466,12 @@
             </div>
         </div>
 
+
+        <!-- Load Rust WASM!! -->
         <script type="module">
-            import init, { greet, gen_nonce } from "./pkg/client.js";
+            import init, { greet } from "./pkg/client.js";
             init().then(() => {
-              greet();
+            //   greet();
             });
           </script>
 

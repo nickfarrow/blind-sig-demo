@@ -42,8 +42,12 @@ function request_sign() {
     )
         .then((response) => response.json())
         .then(function (data) {
-            document.getElementById("blinded_signature").innerHTML = data.signature;
-            document.getElementById("unblind-signature-div").style.visibility = "visible";
+            if (data.signature) {
+                document.getElementById("blinded_signature").innerHTML = data.signature;
+                document.getElementById("unblind-signature-div").style.visibility = "visible";
+            } else {
+                document.getElementById("blinded_signature").innerHTML = "⚠ SIGNING FAILED! Are you trying to reuse this nonce? ⚠"
+            }
         });
     return false;
 }
@@ -60,7 +64,7 @@ function request_verify() {
         .then((response) => response.json())
         .then(function (data) {
             if (data.valid) {
-                document.getElementById("verify_success").innerHTML = "Valid signature 😍🛰";
+                document.getElementById("verify_success").innerHTML = "Valid signature 😍 🐿";
             } else {
                 document.getElementById("verify_success").innerHTML = "INVALID SIGNATURE 😠";
             }
