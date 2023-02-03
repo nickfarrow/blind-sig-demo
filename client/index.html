@@ -79,16 +79,18 @@
         <!-- my garbage js -- WASM is loaded at bottom -->
         <script src="script.js"></script>
 
-        <!-- Load Rust WASM!! -->
-        <script type="module">
-            import init, { greet } from "./pkg/client.js";
-            init().then(() => {
-              greet();
-            });
-        </script>
-
     </head>
     <body>
+            <!-- Load Rust WASM!! -->
+            <script type="module">
+                import init, { greet } from "./pkg/client.js";
+                async function run() {
+                    await init();
+                    // greet();
+                }
+    
+                run();
+            </script>
             <div class="container-fluid">
             <h1>Blind Schnorr Signature Interactive Demo</h1>
             <b>What are blind signatures?</b>
