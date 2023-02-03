@@ -150,7 +150,7 @@ fn create_to_nostr_message_button(window: &Window) {
 
         // Cant use std::time (panic)
         // https://github.com/rust-lang/rust/issues/48564
-        let time_now = date_now() as u64;
+        let time_now = date_now() as u64 / 1000;
 
         let unsigned_event =
             nostr::UnsignedEvent::new_unsigned(pubkey, 1, Vec::new(), existing_message, time_now);
