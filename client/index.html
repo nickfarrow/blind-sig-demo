@@ -78,6 +78,15 @@
 
         <!-- my garbage js -- WASM is loaded at bottom -->
         <script src="script.js"></script>
+
+        <!-- Load Rust WASM!! -->
+        <script type="module">
+            import init, { greet } from "./pkg/client.js";
+            init().then(() => {
+            //   greet();
+            });
+        </script>
+
     </head>
     <body>
             <div class="container-fluid">
@@ -482,16 +491,5 @@
                 </div>
             </div>
         </div>
-
-
-        <!-- Load Rust WASM!! -->
-        <script type="module">
-            import init, { greet } from "./pkg/client.js";
-            init().then(() => {
-            //   greet();
-            });
-          </script>
-
-
     </body>
 </html>

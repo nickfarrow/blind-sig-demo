@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:1234";
+const API_URL = "";
 
 function request_nonce() {
     fetch(API_URL + "/nonce")
