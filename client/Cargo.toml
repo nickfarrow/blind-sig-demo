@@ -48,6 +48,10 @@ features = [
   'HtmlButtonElement',
   'console',
   'KeyboardEvent',
+  'Request',
+  'RequestInit',
+  'RequestMode',
+  'Response',
 ]
 
 [dev-dependencies]

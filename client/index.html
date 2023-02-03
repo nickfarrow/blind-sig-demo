@@ -147,8 +147,9 @@
                                 class="button button1"
                                 type="submit"
                                 id="usenonce_button"
-                                value="Generate Nonces"
+                                value="Generate Nonce"
                             />
+                            <br>
                             <p><b>Server Public Key \(X\)</b>: <span id="server_pubkey"></span></p>
                             <p><b>Nonce \(R\)</b>: <span id="nonce"></span></p>
                         </div>
@@ -162,24 +163,24 @@
                         <br />
                         \(s = k + c'*x\).
                     </p>
-                    <form id="sign" onsubmit="return hit_sign()">
+                    <form id="sign" onsubmit="return request_sign()">
                         <div>
                             <ul class="container">
                                 <li>
                                     <b>Public Nonce \(R\)</b>:
-                                    <input
+                                    <p
                                         id="usednonce_signform"
                                         class="form-control w-100"
                                         readonly
-                                    />
+                                    ></p>
                                 </li>
                                 <li>
-                                    <b>Challenge \(c'\)</b>:
-                                    <input
+                                    <b>Blinded Challenge \(c'\)</b>:
+                                    <p
                                         id="challenge_signform"
                                         class="form-control w-100"
                                         readonly
-                                    />
+                                    ></p>
                                 </li>
                             </ul>
                             <input
@@ -200,58 +201,55 @@
                     <h3>2. Generate blindings</h3>
                     <p>
                         Choose a message \(m\) and generate three random scalar
-                        values \(\alpha, \beta, t\).
+                        values \(\alpha, \beta).
                         <br />
                         These scalars will used to blind (disguise) what we
                         request the server to sign.
                     </p>
-                    <form id="blind" onsubmit="return hit_genblind()">
+                    <form id="blind" onsubmit="return use_message()">
                         <div>
                             <label><b>Message \(m\)</b>:</label>
                             <input
                                 style="display: inline"
                                 class="form-control w-50"
                                 name="message"
-                                id="message"
+                                id="message_input"
                                 placeholder="Enter your message here"
                                 required
                             />
                             <input
                                 class="button button1"
                                 type="submit"
-                                value="Generate blinding values"
+                                value="Use"
                             />
                         </div>
                     </form>
+                    <br />
+                    <p>Message: <span id="message"></span></p>
                     <br />
                     <p>Blinding values:</p>
                     <ul class="container">
                         <li>
                             <b>\(\alpha\)</b>:
-                            <input
+                            <p
                                 id="alpha"
                                 class="form-control w-100"
                                 readonly
-                            />
+                            ></p>
                         </li>
                         <li>
                             <b>\(\beta\)</b>:
-                            <input
+                            <p
                                 id="beta"
                                 class="form-control w-100"
                                 readonly
-                            />
-                        </li>
-                        <li>
-                            <b>\(t\)</b>:
-                            <input id="t" class="form-control w-100" readonly />
+                            ></p>
                         </li>
                     </ul>
                     <h3>3. Apply blindings</h3>
                     <p>Blind the nonce \(R' = R + \alpha*G + \beta*X\).</p>
-                    <p>Blind the public key \(X' = X + t*G\).</p>
                     <p>
-                        For a message \(m\) create a challenge \(c = H(X', R',
+                        For a message \(m\) create a challenge \(c = H(X, R',
                         m)\) using a hash function \(H\), then blind it \(c' = c
                         + \beta\).
                     </p>
@@ -267,18 +265,14 @@
                         />
                     </form>
                     <br />
-                    <div id="blinded_values">
+                    <div id="blinded_values" style="display: none;">
                         <p>
                             <b>Blinded nonce \(R'\)</b>:
                             <span id="blinded_nonce"></span>
                         </p>
                         <p>
-                            <b>Blinded pubkey \(X'\)</b>:
-                            <span id="blinded_publickey"></span>
-                        </p>
-                        <p>
                             <b>Challenge \(c'\)</b>:
-                            <span id="challenge"></span>
+                            <span id="blinded_challenge"></span>
                         </p>
                     </div>
 
@@ -422,42 +416,42 @@
               gen_nonce();
       
 
-              const API_URL = "http://127.0.0.1:1234";
-              async function fetch_nonce() {
-                  return fetch(API_URL + "/nonce")
-                      .then((response) => response.json())
-                      .then((data) => {
-                          console.log(data);
-                          document.getElementById("nonce").innerHTML = data.public_nonce;
-                          document.getElementById("usednonce_signform").value =
-                          data.public_nonce;
-                          document.getElementById("server_pubkey").innerHTML = data.server_pubkey;
-                          return data;
-                      }).await
-                //   return false;
-              }
+            //   const API_URL = "http://127.0.0.1:1234";
+            //   async function fetch_nonce() {
+            //       return fetch(API_URL + "/nonce")
+            //           .then((response) => response.json())
+            //           .then((data) => {
+            //               console.log(data);
+            //               document.getElementById("nonce").innerHTML = data.public_nonce;
+            //               document.getElementById("usednonce_signform").value =
+            //               data.public_nonce;
+            //               document.getElementById("server_pubkey").innerHTML = data.server_pubkey;
+            //               return data;
+            //           }).await
+            //     //   return false;
+            //   }
       
-              let data = fetch_nonce().await;
-              console.log("HERE");
-              console.log(data);
+            //   let data = fetch_nonce().await;
+            //   console.log("HERE");
+            //   console.log(data);
       
-              async function hit_genblind_button() {
-                  var nonce = document.getElementById("nonce").innerHTML;
-                  var server_pubkey = document.getElementById("server_pubkey").innerHTML;
-                  var message = document.getElementById("message").innerHTML;
+            //   async function hit_genblind_button() {
+            //       var nonce = document.getElementById("nonce").innerHTML;
+            //       var server_pubkey = document.getElementById("server_pubkey").innerHTML;
+            //       var message = document.getElementById("message").innerHTML;
       
-                  console.log(document.getElementById("nonce").innerHTML);
-                  console.log(message);
-                  console.log("sasdasd");
-                //   console.log(nonce_data.server_pubkey);
+            //       console.log(document.getElementById("nonce").innerHTML);
+            //       console.log(message);
+            //       console.log("sasdasd");
+            //     //   console.log(nonce_data.server_pubkey);
       
-                  let blinder_interface = new BlinderInterface(nonce, server_pubkey, message);
-                  console.log(blinder_interface);
+            //       let blinder_interface = new BlinderInterface(nonce, server_pubkey, message);
+            //       console.log(blinder_interface);
       
                   
-                  return false;
-              }
-              hit_genblind_button().await;
+            //       return false;
+            //   }
+            //   hit_genblind_button().await;
       
       
             });

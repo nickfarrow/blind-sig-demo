@@ -3,12 +3,12 @@ extern crate rocket;
 
 use blind_sig_demo::cors;
 use rand::RngCore;
-use rocket::serde::json::serde_json;
 use rocket::serde::{json::Json, Serialize};
 use rocket::{get, launch, routes, State};
 use schnorr_fun::blind::{BlindSigner, SignatureRequest};
 use schnorr_fun::nonce::GlobalRng;
 use schnorr_fun::nonce::Synthetic;
+use std::str::FromStr;
 use std::sync::Mutex;
 
 use rand::rngs::ThreadRng;
@@ -50,21 +50,20 @@ pub struct SignatureResponse {
     signature: Scalar<Public, Zero>,
 }
 
-#[get("/sign?<public_nonce>&<blind_challenge>")]
+#[get("/sign?<public_nonce>&<challenge>")]
 pub async fn sign(
     signer_state: &State<BlindSignerState>,
     public_nonce: String,
-    blind_challenge: String,
+    challenge: String,
 ) -> Json<SignatureResponse> {
     let mut blind_signer = signer_state.inner().state.lock().unwrap();
 
     let signature_request = SignatureRequest {
-        public_nonce: serde_json::from_str(&public_nonce).unwrap(),
-        blind_challenge: serde_json::from_str(&blind_challenge).unwrap(),
+        public_nonce: Point::from_str(&public_nonce).unwrap(),
+        blind_challenge: Scalar::from_str(&challenge).unwrap(),
     };
     // Try sign the request
     let _signature_response = blind_signer.sign(signature_request.clone(), &mut rand::thread_rng());
-
     let signature = loop {
         let has_response = blind_signer.lookup_signed(signature_request.public_nonce);
 
@@ -91,7 +90,7 @@ fn rocket() -> _ {
     let nonce_gen = Synthetic::<Sha256, GlobalRng<ThreadRng>>::default();
     let server_schnorr = Schnorr::<Sha256, _>::new(nonce_gen);
     let secret = Scalar::random(&mut rand::thread_rng());
-    let n_sessions = 5;
+    let n_sessions = 1;
 
     let blind_signer = BlindSigner::new(n_sessions, secret, server_schnorr);
 
