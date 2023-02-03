@@ -31,22 +31,22 @@ body {
 }
 
 pre {
-    background-color: gray;
+    /* background-color: gray;
     border: 12px solid rgb(0, 0, 0);
     display: block;
     padding: 20px;
-    padding-top: 0px;
+    padding-top: 0px; */
 }
 
 .addresses {
-    padding-top: 15px;
+    padding-top: 10px;
     white-space: pre-wrap;
     word-wrap: break-word;
-    color:rgb(255, 0, 136);
-    font-weight: 800;
+    color:rgb(255, 0, 166);
+    font-weight: 600;
     font-size: 1em;
     /* text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; */
-    background-image: linear-gradient(to bottom right, rgb(64, 67, 75), rgb(22, 112, 108));
+    /* background-image: linear-gradient(to bottom right, rgb(64, 67, 75), rgb(66, 78, 77)); */
 }
 
 .container-margin {
@@ -76,7 +76,7 @@ p {
 h1 {
     /* font-family: Arial, sans-serif; */
     font-size: 2em;
-    color: #00e472;
+    color: rgb(0, 226, 38);
     text-decoration-color: black;
 }
 

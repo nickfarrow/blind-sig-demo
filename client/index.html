@@ -7,7 +7,7 @@
     <meta name="title" content="Blind Schnorr Signature Interactive Demo" />
     <meta
       name="description"
-      content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers to act as a coordinator while remaining blind to user activity. Click through the steps!"
+      content="Blind sign a Nostr event and post it in this interactive cryptography demo! Click through the steps!"
     />
 
     <!-- Open Graph / Facebook -->
@@ -19,7 +19,7 @@
     />
     <meta
       property="og:description"
-      content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers to act as a coordinator while remaining blind to user activity. Click through the steps!"
+      content="Blind sign a Nostr event and post it in this interactive cryptography demo! Click through the steps!"
     />
     <meta
       property="og:image"
@@ -35,7 +35,7 @@
     />
     <meta
       property="twitter:description"
-      content="Blind signatures are a powerful tool for protecting user privacy, they allow for servers to act as a coordinator while remaining blind to user activity. Click through the steps!"
+      content="Blind sign a Nostr event and post it in this interactive cryptography demo! Click through the steps!"
     />
     <meta
       property="twitter:image"
@@ -66,6 +66,13 @@
       crossorigin="anonymous"
     ></script>
 
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"
+      integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script
       id="MathJax-script"
@@ -76,7 +83,7 @@
     <!-- Style! -->
     <link rel="stylesheet" href="/style.css" />
 
-    <!-- my garbage js -- WASM is loaded at bottom -->
+    <!-- my garbage js -->
     <script src="script.js"></script>
   </head>
   <body>
@@ -93,26 +100,32 @@
     <div class="container-fluid">
       <br />
       <h1>Blind Schnorr Signature Interactive Demo</h1>
+      <h2>
+        Disguise a <span style="color: blueviolet">Nostr</span> event, blindly
+        sign, then unblind the signature and post it!
+      </h2>
       <b>What are blind signatures?</b>
       <br />
-      With regular
+      In order to sign a <i>message</i> with regular
       <a href="https://en.wikipedia.org/wiki/Schnorr_signature" target="_blank"
         >schnorr signatures</a
-      >, a <i>private key</i> and <i>nonce</i> are used to sign a
-      <i>challenge</i> for a <i>message</i>. The signature-nonce pair can then
-      be verified against the signer's <i>public key</i>.
+      >, a <i>secret key</i> and a <i>nonce</i> (random number) are used to sign
+      a <i>challenge</i> for the message, producing a signature. This
+      signature-nonce pair can then be verified against the signer's
+      <i>public key</i>, proving the person signed off on the message using
+      their secret key.
       <br />
       <br />
-      Blind signatures allow for a user to disguise a message and then request a
-      server to sign this disguised message. The user can then take this
-      signature and unblind it, resulting in a signature that is valid for the
-      original message that is completely uncorrelated to what the server was
-      asked to sign.
+      Blind signatures allow for a user (you!) to disguise a message challenge
+      and then request a server to sign your disguised challenge. The user can
+      then take this signature and unblind it. Resulting in a signature that is
+      valid for the original challenge they disguised, while looking completely
+      different to the challenge which the server was asked to sign.
       <br />
       <br />
       <b>Blind signatures are powerful for protecting user privacy</b>, where a
-      server can act as an authority/coordinator while remaining blind to the
-      exact activity occuring.
+      server can act as an authority or coordinator while remaining blind to the
+      exact details of what they are signing off on.
       <br />
       <br />
       See this
@@ -121,13 +134,25 @@
         target="_blank"
         >fantastic article</a
       >
-      by Nadav for an intro on blind signatures and some motivations for the
-      mathematics.
+      by Nadav @ suredbits for an intro on blind signatures and some motivations
+      for the mathematics.
       <br />
       <br />
       <h2>Follow steps 1-6</h2>
-      Get an idea for how blind schnorr signatures work. Actions taken by the
-      <b>signing server</b> are on the left, and <b>user</b>'s are on the right.
+      Let's create a message
+      <span style="color: blueviolet">(or Nostr post!)</span>, blind it, and ask
+      the Blind Schnorr Server to sign it. The server signs the disguised
+      challenge, and sends back a signature. <br />We can then unblind this
+      signature, revealing a completely separate signature that is not only
+      valid but also looks completely unrelated to what we asked of the server.
+      <br />
+      <br />
+      In order to get a better idea for how blind schnorr signatures work,
+      interaction with the
+      <b><u>signing server is on the left</u></b
+      >, and our
+      <b><u>local computation is on the right </u></b>
+      (<small>WASM</small>).
       <br />
       <br />
       <div class="row">
@@ -138,7 +163,7 @@
           <h2><b>Server</b></h2>
           <div id="nonce-gen-div">
             <p>
-              The server has a private key \(x\) and public key \(X = x*G\).
+              The server has some private key \(x\) and public key \(X = x*G\).
               <br />
               <small>
                 (\(G\) is the generator point of an elliptic curve - basically
@@ -184,7 +209,7 @@
                 <label>Enter a message:</label>
                 <input
                   style="display: inline"
-                  class="form-control w-50"
+                  class="w-50"
                   name="message"
                   id="message_input"
                   required
@@ -193,7 +218,7 @@
                   class="button button1"
                   type="submit"
                   onclick="javascript:document.getElementById('create-nostr-div').style.display = 'inline'; return true;"
-                  value="Use raw"
+                  value="Raw"
                 />
                 <br />
               </div>
@@ -206,12 +231,16 @@
                   style="display: none"
                 ></span>
                 (optional)
-                <b>&lt;Unsigned Nostr Event&gt;</b>
-              </p>
-
-              <p id="nostr_event">
                 <br />
               </p>
+              <div id="unsigned-nostr-event" style="display: none">
+                <p>
+                  <b>&lt;Unsigned Nostr Event&gt;</b>
+                </p>
+                <p id="nostr_event">
+                  <br />
+                </p>
+              </div>
             </div>
             <br />
             <span
@@ -228,7 +257,7 @@
           <div id="create-blindings-div" style="visibility: hidden">
             <h2>3. Generate blinding values</h2>
             <p>
-              Generate two random scalar values \(\alpha and \beta).
+              Generate two random scalar values \(\alpha\) and \(\beta\).
               <br />
               These scalars will used to blind (disguise) what we request the
               server to sign.
@@ -244,6 +273,7 @@
             <p class="highlighted_var" id="alpha"></p>
             <b>Beta \(\beta\)</b>:
             <p class="highlighted_var" id="beta"></p>
+            <br />
           </div>
         </div>
       </div>
@@ -253,7 +283,7 @@
           style="padding-right: 1%; border-right: 3px solid white"
         >
           <div id="sign-challenge-div" style="visibility: hidden">
-            <h2>5. Sign challenge</h2>
+            <h2>5. Sign blinded challenge</h2>
             <p>
               Request the server to produce a signature for the challenge using
               the nonce secret \(k\) and private key \(x\)
@@ -262,24 +292,20 @@
             </p>
             <form id="sign" onsubmit="return request_sign()">
               <div>
-                <ul class="container">
-                  <li>
-                    <b>Public Nonce \(R\)</b>:
-                    <p
-                      id="usednonce_signform"
-                      class="form-control w-100 highlighted_var"
-                      readonly
-                    ></p>
-                  </li>
-                  <li>
-                    <b>Blinded Challenge \(c'\)</b>:
-                    <p
-                      id="challenge_signform"
-                      class="form-control w-100 highlighted_var"
-                      readonly
-                    ></p>
-                  </li>
-                </ul>
+                <b>Public Nonce \(R\)</b>:
+                <p
+                  id="usednonce_signform"
+                  class="w-100 highlighted_var"
+                  readonly
+                ></p>
+
+                <b>Blinded Challenge \(c'\)</b>:
+                <p
+                  id="challenge_signform"
+                  class="w-100 highlighted_var"
+                  readonly
+                ></p>
+
                 <input
                   class="button button1"
                   type="submit"
@@ -324,6 +350,7 @@
                 <span class="highlighted_var" id="blinded_challenge"></span>
               </p>
             </div>
+            <br />
           </div>
           <div id="unblind-signature-div" style="visibility: hidden">
             <h2>6. Unblind signature</h2>
@@ -335,14 +362,14 @@
             <small>🦀 Locally unblind the signature!</small>
             <br />
             <p>
-              <b>Signature \(s'\)</b>:
+              <b>Unblinded signature \(s'\)</b>:
               <span class="highlighted_var" id="unblinded_signature"></span>
             </p>
           </div>
         </div>
       </div>
       <br />
-      <hr />
+      <hr style="border-color: white; height: 3px" />
       <br />
       <div id="bottom-row-div" style="visibility: hidden">
         <div class="row">
@@ -361,40 +388,52 @@
             </p>
             <form id="verify" onsubmit="return request_verify()">
               <div>
-                <ul class="container">
+                <p>
+                  <b>Publickey</b>:
+                  <span class="highlighted_var" id="pubkey_verifyform"></span>
+                </p>
+                <p>
+                  <b>Message</b>:
+                  <span class="highlighted_var" id="message_verifyform"></span>
+                </p>
+                <p>
+                  <b>Signature</b>:
+                  <input
+                    id="signature_verifyform"
+                    class="w-75"
+                    placeholder="Paste signature here"
+                  />
+                </p>
+                <p>
+                  <b>Blinded nonce</b>:
+                  <span
+                    class="highlighted_var"
+                    id="blinded_nonce_verifyform"
+                  ></span>
+                </p>
+                <!-- <ul class="container"> -->
+                <!-- 
                   <li>
                     <b>Publickey</b>:
-                    <input
-                      id="pubkey_verifyform"
-                      class="form-control w-100"
-                      readonly
-                    />
+                    <p id="pubkey_verifyform"></p>
                   </li>
                   <li>
                     <b>Message</b>:
-                    <input
-                      id="message_verifyform"
-                      class="form-control w-100"
-                      readonly
-                    />
+                    <p id="message_verifyform"></p>
                   </li>
                   <li>
                     <b>Signature</b>:
                     <input
                       id="signature_verifyform"
-                      class="form-control w-100"
+                      class="w-100"
                       placeholder="Paste signature here"
                     />
                   </li>
                   <li>
                     <b>Blinded nonce</b>:
-                    <input
-                      id="blinded_nonce_verifyform"
-                      class="form-control w-100"
-                      readonly
-                    />
+                    <p id="blinded_nonce_verifyform"></p>
                   </li>
-                </ul>
+                </ul> -->
 
                 <input
                   class="button button1"
@@ -407,6 +446,7 @@
           </div>
           <div class="col-md-6">
             <div id="broadcast-nostr-div" style="display: none">
+              <h2>Broadcast nostr event</h2>
               <b>&lt;Signed Nostr Event&gt;</b>
               <p id="signed_nostr_event"></p>
               <div id="broadcast-nostr-button-wasm"></div>
@@ -415,12 +455,12 @@
             <div>
               <h2>Schnorr Verification Equation</h2>
               <p>
-                Exercise: show \((s', R')\) solves the schnorr verification
-                equation \((s' * G = R' + c*X)\) for challenge \(c\) under
-                public key \(X\):
+                Math: show \((s', R')\) solves the schnorr verification equation
+                \((s' * G = R' + c*X)\) for challenge \(c\) under public key
+                \(X\):
               </p>
               <small
-                >Hint: Expand \(s'\) from definitions (plug and chug
+                >Hint: Expand \(s'\) from definitions (plug and chug the
                 algebra)</small
               >
               <br />
@@ -456,6 +496,82 @@
               <br />
               <br />
             </div>
+
+            <div id="thanks" style="display: none">
+              <h2>Thanks for trying!</h2>
+              <p>
+                <b>Code:</b> the current client-server code is not yet
+                published, though you should check out my
+                <a href="https://github.com/LLFourn/secp256kfun/pull/98"
+                  >blind schnorr signature PR to secp256kfun</a
+                >!
+                <br />
+                <br />
+                <b>Why?</b> To showcase some cool cryptography. I haven't yet
+                thought of any good reasons why you would want to post to Nostr
+                in this way. Though you could sell nonces for posting rights..
+                <br />
+                <br />
+                The previous version of this demo had no local client and
+                everything was computed serverside, which made no sense in
+                practice. Now there is separation between rocket rs API and
+                client WASM.
+                <br />
+                <br />
+                <b>"Unlimited signing access is going to be chaos"</b>
+                <br />
+                Yes but it may be fun to watch! What will you sign?
+                <br />
+                <br />
+                <b>My nonce expired!: </b>currently I have limited the server to
+                only allow one signing session at any one time. This is to
+                prevent
+                <a
+                  href="https://www.iacr.org/archive/crypto2002/24420288/24420288.pdf"
+                  target="_blank"
+                  >Wagner attacks</a
+                >, where concurrent signing sessions can allow for a forgery.
+              </p>
+              <small>
+                Did this help you understand blind schnorr signatures?
+                <br />or did you just have fun posting anon under an open Nostr
+                account 🕵
+              </small>
+              <pre class="addresses" id="ln_addy"></pre>
+              <img
+                style="
+                  max-width: 150px;
+                  display: block;
+                  margin-left: auto;
+                  margin-right: auto;
+                "
+                id="qr"
+                src=""
+              />
+              <p>
+                <a href="https://pay.utxo.club/" target="_blank"
+                  >contribute other</a
+                >
+              </p>
+              <script type="text/javascript">
+                var invoiceData = { amount: "47474", method: "lightning" };
+                $.get(
+                  "https://pay.utxo.club/api/createpayment",
+                  invoiceData
+                ).then(function (data) {
+                  invoice = data.invoice;
+                  payment_uuid = invoice.uuid;
+                  $("#ln_addy").text(invoice.address).html();
+                  document.getElementById("qr").src =
+                    "https://pay.utxo.club/static/qr_codes/" +
+                    payment_uuid +
+                    ".png";
+                  return payment_uuid;
+                });
+                document.getElementById("thanks").style.display = "inline";
+              </script>
+            </div>
+
             <div style="display: none">
               <h2>Schnorr Verification Equation With Tweaked Public Key</h2>
               <p>

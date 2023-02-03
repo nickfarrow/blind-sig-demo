@@ -103,6 +103,7 @@ pub fn broadcast_event(event: &SignedEvent) {
 
     for relay in vec![
         "wss://relay.damus.io",
+        "wss://nostr.relayer.se",
         "wss://nostr.zebedee.cloud",
         "wss://nostr.bitcoiner.social",
         "wss://relay.nostr.ch",

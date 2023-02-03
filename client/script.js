@@ -34,6 +34,7 @@ function use_message() {
     document.getElementById("message").innerHTML = message;
     document.getElementById("create-blindings-div").style.visibility = "visible";
     document.getElementById("create-nostr-wasm-button").style.display = "inline";
+    document.getElementById("unsigned-nostr-event").style.display = "none";
     return false;
 }
 
@@ -41,9 +42,9 @@ function hit_apply_bindings() {
     document.getElementById("blinded_values").style.display = "inline";
     document.getElementById("sign-challenge-div").style.visibility = "visible";
 
-    document.getElementById("message_verifyform").value = document.getElementById("message").innerHTML;
-    document.getElementById("pubkey_verifyform").value = document.getElementById("server_pubkey").innerHTML;
-    document.getElementById("blinded_nonce_verifyform").value = document.getElementById("blinded_nonce").innerHTML;
+    document.getElementById("message_verifyform").innerHTML = document.getElementById("message").innerHTML;
+    document.getElementById("pubkey_verifyform").innerHTML = document.getElementById("server_pubkey").innerHTML;
+    document.getElementById("blinded_nonce_verifyform").innerHTML = document.getElementById("blinded_nonce").innerHTML;
     return false;
 }
 
@@ -61,7 +62,7 @@ function request_sign() {
                 document.getElementById("blinded_signature").innerHTML = data.signature;
                 document.getElementById("unblind-signature-div").style.visibility = "visible";
             } else {
-                document.getElementById("blinded_signature").innerHTML = "⚠ SIGNING FAILED! Are you trying to reuse this nonce? ⚠"
+                document.getElementById("blinded_signature").innerHTML = "⚠ SIGNING SERVER REFUSED TO SIGN! Nonce expired (be fast), or are you trying to reuse this nonce? ⚠"
             }
         });
     return false;
@@ -71,9 +72,9 @@ function request_verify() {
     fetch(
         API_URL + "/verify?" +
             new URLSearchParams({
-                message: document.getElementById("message_verifyform").value,
+                message: document.getElementById("message_verifyform").innerHTML,
                 signature: document.getElementById("signature_verifyform").value,
-                public_nonce: document.getElementById("blinded_nonce_verifyform").value,
+                public_nonce: document.getElementById("blinded_nonce_verifyform").innerHTML,
             })
     )
         .then((response) => response.json())

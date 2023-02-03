@@ -11,7 +11,7 @@ use schnorr_fun::nonce::GlobalRng;
 use schnorr_fun::nonce::Synthetic;
 use schnorr_fun::{Message, Signature};
 use std::str::FromStr;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use rand::rngs::ThreadRng;
 use schnorr_fun::fun::Point;
@@ -22,7 +22,7 @@ use schnorr_fun::{
 use sha2::Sha256;
 
 pub struct BlindSignerState {
-    state: Mutex<BlindSigner<Sha256, Synthetic<Sha256, GlobalRng<ThreadRng>>>>,
+    state: Arc<Mutex<BlindSigner<Sha256, Synthetic<Sha256, GlobalRng<ThreadRng>>>>>,
 }
 
 #[derive(Serialize)]
@@ -66,9 +66,13 @@ pub async fn sign(
     let mut blind_signer = signer_state.inner().state.lock().unwrap();
     // Try sign the request
     let _signature_response = blind_signer.sign(signature_request.clone(), &mut rand::thread_rng());
-    let signature = loop {
-        let has_response = blind_signer.lookup_signed(signature_request.public_nonce);
+    drop(blind_signer);
 
+    let signature = loop {
+        let blind_signer = signer_state.inner().state.lock().unwrap();
+        let has_response = blind_signer.lookup_signed(signature_request.public_nonce);
+        drop(blind_signer);
+        dbg!(has_response);
         match has_response {
             None => {
                 // pause then poll again
@@ -147,6 +151,6 @@ fn rocket() -> _ {
         .mount("/", FileServer::from("./client"))
         .attach(cors::CORS)
         .manage(BlindSignerState {
-            state: Mutex::new(blind_signer),
+            state: Arc::new(Mutex::new(blind_signer)),
         })
 }

@@ -35,7 +35,7 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn greet() {
-    alert("Loaded: secp256kfun Schnorr Blind Signature WASM 🦀");
+    alert("Sucessfully loaded secp256kfun Schnorr Blind Signature WASM 🦀");
 }
 
 fn create_gen_blindings_button(window: &Window) {
@@ -132,7 +132,7 @@ fn create_to_nostr_message_button(window: &Window) {
         .dyn_into::<web_sys::HtmlButtonElement>()
         .map_err(|_| ())
         .unwrap();
-    to_nostr_message_button.set_inner_html("Blind sign Nostr event");
+    to_nostr_message_button.set_inner_html("Convert into Nostr event");
     let on_down = EventListener::new(&to_nostr_message_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Transform into Nostr Event".into());
 
@@ -167,6 +167,17 @@ fn create_to_nostr_message_button(window: &Window) {
             .unwrap()
             .set_inner_html(&serde_json::to_string(&unsigned_event).unwrap());
 
+        // Hide the button again
+        document
+            .get_element_by_id("create-nostr-wasm-button")
+            .unwrap()
+            .set_attribute("style", "display: none;") // Hacky -- idk how to properly set style.visibility
+            .unwrap();
+        document
+            .get_element_by_id("unsigned-nostr-event")
+            .unwrap()
+            .set_attribute("style", "") // Hacky -- idk how to properly set style.visibility
+            .unwrap();
         // Unhide the nostr broadcast div
         document
             .get_element_by_id("broadcast-nostr-div")
@@ -284,10 +295,7 @@ fn create_broadcast_nostr_button(window: &Window) {
         web_sys::console::log_1(&"Attached signature to event!".into());
 
         nostr::broadcast_event(&nostr_signed);
-        alert(&format!(
-            "Broadcasted Nostr event: nostr.guru/e/{}",
-            nostr_signed.id
-        ));
+        alert(&format!("Broadcasted Nostr event: {} . Search on nostr.guru, sometimes takes a while to appear..", nostr_signed.id));
         web_sys::console::log_1(&"Broadcasted nostr event!".into());
     });
     on_down.forget();
