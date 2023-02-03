@@ -45,6 +45,7 @@ features = [
   'HtmlElement',
   'HtmlParagraphElement',
   'HtmlTextAreaElement',
+  'HtmlButtonElement',
   'console',
   'KeyboardEvent',
 ]
