@@ -1,0 +1,68 @@
+[package]
+name = "client"
+version = "0.1.0"
+authors = ["Nick Farrow <nick@nickfarrow.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]
+
+[dependencies]
+wasm-bindgen = "0.2.84"
+gloo = "0.2.0"
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.6", optional = true }
+
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. It is slower than the default
+# allocator, however.
+wee_alloc = { version = "0.4.5", optional = true }
+
+
+schnorr_fun = { git = "https://github.com/nickfarrow/secp256kfun", rev = "bde5e8356b03e3515096e5a999cf00bb7f755332", features = ["serde"]}
+getrandom = { version = "0.2", features = ["js"] }
+sha2 = "0.10"
+rand = { version = "0.8" }
+serde_json = "1"
+serde = "1.0.152"
+hex = "0.4.3"
+js-sys = "0.3"
+
+[dependencies.web-sys]
+version = "0.3.4"
+features = [
+  'Document',
+  'Element',
+  'HtmlElement',
+  'Node',
+  'Window',
+  'EventListener',
+  'CssStyleDeclaration',
+  'HtmlElement',
+  'HtmlParagraphElement',
+  'HtmlTextAreaElement',
+  'HtmlButtonElement',
+  'console',
+  'KeyboardEvent',
+  'Request',
+  'RequestInit',
+  'RequestMode',
+  'Response',
+  'WebSocket',
+  'MessageEvent',
+  'ProgressEvent',
+]
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.13"
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"

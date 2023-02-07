@@ -1,2 +1,6 @@
+[global]
+port = 1234
+workers = 6
+
 [default.databases.main]
 url = "./database.db"
