@@ -1,14 +1,19 @@
 # Blind signatures demo
 
-## Running locally
-Create the database with
+## Build
+
+Build the WASM Blind Signature Client
+
 ```
-sqlite3 database.db < database_scripts/up.sql
+cd client/
+wasm-pack build --target web
+cd ..
 ```
 
-Run
+Run the Blind Signing Server:
+
 ```
 cargo run
 ```
 
-Visit [localhost](http://127.0.0.1:8000)
+(in project root directory)
