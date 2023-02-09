@@ -1,5 +1,6 @@
 mod nostr;
 mod utils;
+use crate::utils::set_panic_hook;
 
 use std::str::FromStr;
 
@@ -60,8 +61,7 @@ fn create_gen_blindings_button(window: &Window) {
         let message_text = message_input.inner_html();
         web_sys::console::log_1(
             &format!(
-                "Success reading nonce ({}), pubkey ({}), message ({}) into rust",
-                nonce_input, server_pubkey_input, message_text
+                "Success reading nonce ({nonce_input}), pubkey ({server_pubkey_input}), message ({message_text}) into rust",
             )
             .into(),
         );
@@ -72,7 +72,7 @@ fn create_gen_blindings_button(window: &Window) {
         let message = Message::raw(&message_bytes);
 
         let nonce_gen = nonce::Synthetic::<Sha256, nonce::GlobalRng<ThreadRng>>::default();
-        let schnorr = Schnorr::<Sha256, _>::new(nonce_gen.clone());
+        let schnorr = Schnorr::<Sha256, _>::new(nonce_gen);
 
         web_sys::console::log_1(&"About to apply blindings".into());
 
@@ -159,7 +159,7 @@ fn create_to_nostr_message_button(window: &Window) {
         document
             .get_element_by_id("message")
             .unwrap()
-            .set_inner_html(&unsigned_event.id.clone());
+            .set_inner_html(&unsigned_event.id);
 
         // Store unsigned nostr event for later broadcasting
         document
@@ -311,6 +311,7 @@ fn create_broadcast_nostr_button(window: &Window) {
 
 #[wasm_bindgen(start)]
 pub fn main_js() -> Result<(), JsValue> {
+    set_panic_hook();
     let window = web_sys::window().expect("global window does not exists");
 
     create_gen_blindings_button(&window);

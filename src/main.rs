@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate rocket;
 
 use blind_sig_demo::cors;
@@ -21,8 +20,9 @@ use schnorr_fun::{
 };
 use sha2::Sha256;
 
+type SignerState = Arc<Mutex<BlindSigner<Sha256, Synthetic<Sha256, GlobalRng<ThreadRng>>>>>;
 pub struct BlindSignerState {
-    state: Arc<Mutex<BlindSigner<Sha256, Synthetic<Sha256, GlobalRng<ThreadRng>>>>>,
+    state: SignerState,
 }
 
 #[derive(Serialize)]
@@ -104,7 +104,7 @@ pub fn verify(
     public_nonce: String,
     signer_state: &State<BlindSignerState>,
 ) -> Json<VerifyResponse> {
-    let signature_scalar = match Scalar::from_str(&signature.trim()) {
+    let signature_scalar = match Scalar::from_str(signature.trim()) {
         Ok(sig) => sig,
         Err(_) => return Json(VerifyResponse { valid: false }),
     };

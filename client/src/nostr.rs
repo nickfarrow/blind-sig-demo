@@ -39,7 +39,7 @@ impl UnsignedEvent {
         let mut hash = Sha256::default();
         hash.update(serialized_event.to_string().as_bytes());
         let hash_result = hash.finalize();
-        let hash_result_str = format!("{:x}", hash_result);
+        let hash_result_str = format!("{hash_result:x}");
 
         Self {
             id: hash_result_str,
@@ -83,9 +83,9 @@ fn publish_to_relay(relay: String, message: String) -> Result<(), String> {
     let onopen_callback = Closure::<dyn FnMut()>::new(move || {
         match cloned_ws.send_with_str(&message) {
             Ok(_) => {
-                web_sys::console::log_1(&format!("event successfully sent to {}!", relay).into())
+                web_sys::console::log_1(&format!("event successfully sent to {relay}!").into())
             }
-            Err(e) => web_sys::console::log_1(&format!("message failed to send {:?}", e).into()),
+            Err(e) => web_sys::console::log_1(&format!("message failed to send {e:?}").into()),
         };
     });
     ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
@@ -101,7 +101,7 @@ pub fn broadcast_event(event: &SignedEvent) {
     let event_msg = json!(["EVENT", event]).to_string();
     dbg!("{}", &event_msg);
 
-    for relay in vec![
+    for relay in &[
         "wss://relay.damus.io",
         "wss://nostr.relayer.se",
         "wss://nostr.zebedee.cloud",
@@ -112,8 +112,8 @@ pub fn broadcast_event(event: &SignedEvent) {
         "wss://nostr.oxtr.dev",
     ] {
         match publish_to_relay(relay.to_string(), event_msg.to_string()) {
-            Ok(_) => println!("sent message to {}", relay),
-            Err(e) => eprintln!("{}", e),
+            Ok(_) => println!("sent message to {relay}"),
+            Err(e) => eprintln!("{e}"),
         };
     }
 }
