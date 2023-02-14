@@ -1,3 +1,5 @@
+// This is my first WASM ever and horrendously ugly and hacked together, but powerful!
+
 mod nostr;
 mod utils;
 use crate::utils::set_panic_hook;
