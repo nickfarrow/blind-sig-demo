@@ -8,7 +8,7 @@ bdk = "0.20.0"
 miniscript = "7.0.0"
 json = "0.12.4"
 serde = "1.0.140"
-schnorr_fun = { git = "https://github.com/nickfarrow/secp256kfun", rev = "bde5e8356b03e3515096e5a999cf00bb7f755332", features = ["serde"]}
+schnorr_fun = { git = "https://github.com/nickfarrow/secp256kfun", rev = "28e4458a3dc1a8f9e5499c0b6d939ec412bb588a", features = ["serde"]}
 sha2 = "0.10"
 rand = "0.8.5"
 hex = "0.4.3"

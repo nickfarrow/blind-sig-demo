@@ -19,6 +19,7 @@ pub struct UnsignedEvent {
     content: String,
     //hacky and gross
     // Should be Message::raw(unsigned_frostr_event.hash_bytes.as_slice());
+    #[serde(skip)]
     pub hash_bytes: Vec<u8>,
 }
 
@@ -65,7 +66,7 @@ impl UnsignedEvent {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct SignedEvent {
     pub id: String,
     pubkey: Point<EvenY>,

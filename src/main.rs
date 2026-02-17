@@ -111,13 +111,13 @@ pub fn verify(
     let blinded_pubnonce: Point<Normal> =
         Point::from_str(&public_nonce).expect("valid formed public nonce");
 
-    let signature: Signature<Public> = Signature {
+    let signature: Signature = Signature {
         s: signature_scalar,
         R: blinded_pubnonce.into_point_with_even_y().0,
     };
 
     let message_bytes = hex::decode(message).unwrap();
-    let message: Message<Public> = Message::raw(&message_bytes);
+    let message = Message::raw(&message_bytes);
 
     let blind_signer = signer_state.inner().state.lock().unwrap();
     Json(VerifyResponse {

@@ -11,7 +11,7 @@ use rand::rngs::ThreadRng;
 use schnorr_fun::{
     blind::{self, Blinder},
     fun::{
-        marker::{Normal, Public},
+        marker::Normal,
         Point, Scalar,
     },
     nonce, Message, Schnorr, Signature,
@@ -23,11 +23,6 @@ use gloo::events::EventListener;
 use wasm_bindgen::JsCast;
 use web_sys::Window;
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 extern "C" {
@@ -50,6 +45,7 @@ fn create_gen_blindings_button(window: &Window) {
         .map_err(|_| ())
         .unwrap();
     gen_blindings_button.set_inner_html("Generate blinding values");
+    gen_blindings_button.set_class_name("button");
     let on_down = EventListener::new(&gen_blindings_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Generate blinding values".into());
         // Read nonces from doc
@@ -79,7 +75,7 @@ fn create_gen_blindings_button(window: &Window) {
         web_sys::console::log_1(&"About to apply blindings".into());
 
         // Generate blinding tweaks
-        let blinder = Blinder::blind(nonce, pubkey, message, schnorr, &mut rand::thread_rng());
+        let blinder = Blinder::blind(message, nonce, pubkey, schnorr, &mut rand::thread_rng());
 
         // Store alpha and beta
         document
@@ -135,6 +131,7 @@ fn create_to_nostr_message_button(window: &Window) {
         .map_err(|_| ())
         .unwrap();
     to_nostr_message_button.set_inner_html("Convert into Nostr event");
+    to_nostr_message_button.set_class_name("button");
     let on_down = EventListener::new(&to_nostr_message_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Transform into Nostr Event".into());
 
@@ -209,6 +206,7 @@ fn create_unblind_button(window: &Window) {
         .map_err(|_| ())
         .unwrap();
     unblind_button.set_inner_html("Unblind Signature");
+    unblind_button.set_class_name("button");
     let on_down = EventListener::new(&unblind_button, "mousedown", move |_event| {
         web_sys::console::log_1(&"Unblind Signature".into());
 
@@ -225,10 +223,19 @@ fn create_unblind_button(window: &Window) {
             .expect("valid alpha string");
 
         let signature = blind::unblind_signature(blinded_signature, &alpha);
+        let sig_str = signature.to_string();
         document
             .get_element_by_id("unblinded_signature")
             .unwrap()
-            .set_inner_html(&signature.to_string());
+            .set_inner_html(&sig_str);
+
+        // Auto-populate the verify form signature field
+        document
+            .get_element_by_id("signature_verifyform")
+            .unwrap()
+            .dyn_ref::<web_sys::HtmlInputElement>()
+            .unwrap()
+            .set_value(&sig_str);
 
         // Unhide the next div
         document
@@ -248,18 +255,18 @@ fn create_unblind_button(window: &Window) {
         .unwrap();
 }
 
-fn create_broadcast_nostr_button(window: &Window) {
-    // Create a unblind button
+fn create_add_signature_button(window: &Window) {
     let document = window.document().expect("expecting a document on window");
-    let broadcast_button = document
+    let add_sig_button = document
         .create_element("button")
         .unwrap()
         .dyn_into::<web_sys::HtmlButtonElement>()
         .map_err(|_| ())
         .unwrap();
-    broadcast_button.set_inner_html("Add signature & broadcast event!");
-    let on_down = EventListener::new(&broadcast_button, "mousedown", move |_event| {
-        web_sys::console::log_1(&"Broadcasting nostr event".into());
+    add_sig_button.set_inner_html("Add signature to event");
+    add_sig_button.set_class_name("button");
+    let on_down = EventListener::new(&add_sig_button, "mousedown", move |_event| {
+        web_sys::console::log_1(&"Adding signature to nostr event".into());
 
         let nostr_unsigned: UnsignedEvent = serde_json::from_str(
             &document
@@ -283,7 +290,7 @@ fn create_broadcast_nostr_button(window: &Window) {
         let blinded_pubnonce: Point<Normal> =
             Point::from_str(&blinded_nonce).expect("valid formed public nonce");
 
-        let signature: Signature<Public> = Signature {
+        let signature: Signature = Signature {
             s: Scalar::from_str(&signature).unwrap(),
             R: blinded_pubnonce.into_point_with_even_y().0,
         };
@@ -294,15 +301,78 @@ fn create_broadcast_nostr_button(window: &Window) {
             .unwrap()
             .set_inner_html(&serde_json::to_string(&nostr_signed).unwrap());
 
-        web_sys::console::log_1(&"Attached signature to event!".into());
+        // Show the signed event and broadcast button
+        document
+            .get_element_by_id("signed-event-display")
+            .unwrap()
+            .set_attribute("style", "")
+            .unwrap();
 
-        nostr::broadcast_event(&nostr_signed);
-        alert(&format!("Broadcasted Nostr event: {} . Search on nostr.guru, sometimes takes a while to appear..", nostr_signed.id));
-        web_sys::console::log_1(&"Broadcasted nostr event!".into());
+        web_sys::console::log_1(&"Attached signature to event!".into());
     });
     on_down.forget();
 
-    // Write unblind_button into HTML
+    let document = window.document().expect("expecting a document on window");
+    document
+        .get_element_by_id("add-signature-button-wasm")
+        .unwrap()
+        .append_child(&add_sig_button)
+        .unwrap();
+}
+
+fn create_broadcast_nostr_button(window: &Window) {
+    let document = window.document().expect("expecting a document on window");
+    let broadcast_button = document
+        .create_element("button")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlButtonElement>()
+        .map_err(|_| ())
+        .unwrap();
+    broadcast_button.set_inner_html("Broadcast to relays");
+    broadcast_button.set_class_name("button");
+    let on_down = EventListener::new(&broadcast_button, "mousedown", move |_event| {
+        web_sys::console::log_1(&"Broadcasting nostr event".into());
+
+        let nostr_signed_json = document
+            .get_element_by_id("signed_nostr_event")
+            .unwrap()
+            .inner_html();
+
+        let nostr_signed: nostr::SignedEvent =
+            serde_json::from_str(&nostr_signed_json).unwrap();
+
+        nostr::broadcast_event(&nostr_signed);
+
+        // Build NIP-19 nevent bech32 link
+        let event_id_bytes = hex::decode(&nostr_signed.id).unwrap();
+        // TLV: type 0 (event id) + length 32 + 32 bytes
+        let mut tlv = Vec::new();
+        tlv.push(0u8); // type: event id
+        tlv.push(32u8); // length
+        tlv.extend_from_slice(&event_id_bytes);
+        // Add a relay hint (type 1)
+        let relay = b"wss://relay.damus.io";
+        tlv.push(1u8); // type: relay
+        tlv.push(relay.len() as u8); // length
+        tlv.extend_from_slice(relay);
+
+        let nevent = bech32::encode::<bech32::Bech32>(
+            bech32::Hrp::parse("nevent").unwrap(),
+            &tlv,
+        ).unwrap();
+        let njump_url = format!("https://njump.me/{}", nevent);
+
+        let link_el = document.get_element_by_id("njump-link").unwrap();
+        link_el.set_inner_html(&format!(
+            "<a href=\"{}\" target=\"_blank\">View on Nostr</a>",
+            njump_url
+        ));
+        link_el.set_attribute("style", "").unwrap();
+
+        alert(&format!("Broadcasted Nostr event: {}", nostr_signed.id));
+    });
+    on_down.forget();
+
     let document = window.document().expect("expecting a document on window");
     document
         .get_element_by_id("broadcast-nostr-button-wasm")
@@ -319,6 +389,7 @@ pub fn main_js() -> Result<(), JsValue> {
     create_gen_blindings_button(&window);
     create_to_nostr_message_button(&window);
     create_unblind_button(&window);
+    create_add_signature_button(&window);
     create_broadcast_nostr_button(&window);
 
     Ok(())

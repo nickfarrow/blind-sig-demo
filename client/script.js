@@ -1,5 +1,16 @@
 const API_URL = "";
 
+function copyField(el) {
+    var text = el.innerText.trim();
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(function () {
+        el.classList.add("copied");
+        setTimeout(function () {
+            el.classList.remove("copied");
+        }, 1500);
+    });
+}
+
 function request_nonce() {
     fetch(API_URL + "/nonce")
         .then((response) => response.json())
@@ -28,8 +39,6 @@ function to_hex(our_string) {
 function use_message() {
     var message = document.getElementById("message_input").value;
     document.getElementById("original_message").innerHTML = message;
-    // message = message.split ('').map (function (c) { return c.charCodeAt (0); });
-    // message = message.map(n => n.toString(16).padStart(2, '0')).join('');
     message = to_hex(message);
     document.getElementById("message").innerHTML = message;
     document.getElementById("create-blindings-div").style.visibility = "visible";
@@ -62,7 +71,7 @@ function request_sign() {
                 document.getElementById("blinded_signature").innerHTML = data.signature;
                 document.getElementById("unblind-signature-div").style.visibility = "visible";
             } else {
-                document.getElementById("blinded_signature").innerHTML = "⚠ SIGNING SERVER REFUSED TO SIGN! Nonce expired (be fast), or are you trying to reuse this nonce? ⚠"
+                document.getElementById("blinded_signature").innerHTML = "SIGNING SERVER REFUSED TO SIGN! Nonce expired (be fast), or are you trying to reuse this nonce?"
             }
         });
     return false;
@@ -80,11 +89,10 @@ function request_verify() {
         .then((response) => response.json())
         .then(function (data) {
             if (data.valid) {
-                document.getElementById("verify_success").innerHTML = "Valid signature 😍 🐿";
+                document.getElementById("verify_success").innerHTML = "Valid signature!";
             } else {
-                document.getElementById("verify_success").innerHTML = "INVALID SIGNATURE 😠";
+                document.getElementById("verify_success").innerHTML = "INVALID SIGNATURE";
             }
         });
     return false;
 }
-
